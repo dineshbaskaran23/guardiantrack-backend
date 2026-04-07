@@ -1,0 +1,58 @@
+# ═══════════════════════════════════════════════════════════════
+# Render.com Deployment Config — GuardianTrack Backend
+# ═══════════════════════════════════════════════════════════════
+# 
+# HOW TO USE:
+# 1. Push guardian-backend/ to GitHub (private repo)
+# 2. Go to render.com → New → Web Service → Connect GitHub
+# 3. Render will auto-detect this file
+# 4. You only need to add MONGO_URI and FAST2SMS_KEY manually
+#    (all other secrets are pre-generated below)
+# ═══════════════════════════════════════════════════════════════
+
+services:
+  - type: web
+    name: guardiantrack-backend
+    env: node
+    plan: free
+    rootDir: .
+    buildCommand: npm install
+    startCommand: node server.js
+    healthCheckPath: /health
+    autoDeploy: true
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: JWT_SECRET
+        value: a132980bb214f05be05d7e154b156eb69591c73b8556b299f0ab33d6dedc6fa856f3210db7fbe3a50bb7c7ba476ac2932c1e8759e4fb7476429e1a421fbe3534
+      - key: JWT_EXPIRES_IN
+        value: 30d
+      - key: DEVICE_SECRET
+        value: e88fb9b3328618f62564e6e3dc19fd7671f49fd0b5409c230091e5aafc932aae
+      - key: SESSION_SECRET
+        value: 7700c8b21135b1909501e52661fd7c7cff492f4a4652a394c212c658a1f93ff1
+      - key: BATTERY_ALERT_THRESHOLD
+        value: 20
+      - key: OFFLINE_ALERT_MINUTES
+        value: 15
+      - key: DEFAULT_GEOFENCE_RADIUS_M
+        value: 500
+      - key: RATE_LIMIT_WINDOW_MS
+        value: 900000
+      - key: RATE_LIMIT_MAX
+        value: 100
+      - key: USE_FAST2SMS
+        value: 'true'
+      # ── ADD THESE MANUALLY IN RENDER DASHBOARD ──
+      # These contain sensitive credentials — do not put in git
+      - key: MONGO_URI
+        sync: false   # <-- Render will ask you to enter this manually
+      - key: FAST2SMS_KEY
+        sync: false   # <-- Render will ask you to enter this manually
+      # ── OPTIONAL: Twilio (if not using Fast2SMS) ──
+      - key: TWILIO_SID
+        sync: false
+      - key: TWILIO_TOKEN
+        sync: false
+      - key: TWILIO_FROM
+        sync: false
