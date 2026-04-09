@@ -1,0 +1,586 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no"/>
+<title>GuardianTrack</title>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+<style>
+:root {
+  --blue: #185FA5; --blue-light: #E6F1FB; --blue-dark: #0C447C;
+  --green: #3B6D11; --green-light: #EAF3DE; --green-bg: #639922;
+  --red: #A32D2D; --red-light: #FCEBEB;
+  --amber: #BA7517; --amber-light: #FAEEDA;
+  --gray: #f5f5f7; --border: #e5e5e5; --text: #111; --muted: #888;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+body { background: var(--gray); color: var(--text); font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; min-height: 100vh; }
+
+/* HEADER */
+.header { background: var(--blue); color: white; padding: 14px 20px; display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; z-index: 100; box-shadow: 0 2px 12px rgba(0,0,0,0.15); }
+.header-left { display: flex; align-items: center; gap: 10px; }
+.app-icon { width: 36px; height: 36px; border-radius: 10px; background: rgba(255,255,255,0.2); display: flex; align-items: center; justify-content: center; font-size: 18px; }
+.header h1 { font-size: 18px; font-weight: 700; letter-spacing: -0.3px; }
+.header-sub { font-size: 11px; opacity: 0.75; }
+.live-pill { display: flex; align-items: center; gap: 5px; background: rgba(255,255,255,0.15); padding: 5px 10px; border-radius: 20px; font-size: 12px; }
+.live-dot { width: 7px; height: 7px; border-radius: 50%; background: #5DCAA5; animation: blink 1.5s infinite; }
+@keyframes blink { 0%,100%{opacity:1} 50%{opacity:0.3} }
+
+/* CONTAINER */
+.container { padding: 16px; max-width: 480px; margin: 0 auto; }
+
+/* PARENT CARD */
+.parent-card { background: white; border-radius: 16px; border: 1px solid var(--border); padding: 16px; margin-bottom: 14px; display: flex; align-items: center; gap: 14px; }
+.parent-avatar { width: 52px; height: 52px; border-radius: 50%; background: var(--blue-light); display: flex; align-items: center; justify-content: center; font-size: 22px; font-weight: 700; color: var(--blue); border: 2px solid var(--blue); flex-shrink: 0; }
+.parent-info { flex: 1; }
+.parent-name { font-size: 16px; font-weight: 700; margin-bottom: 3px; }
+.parent-phone { font-size: 12px; color: var(--muted); margin-bottom: 6px; }
+.parent-badges { display: flex; gap: 6px; flex-wrap: wrap; }
+.badge { font-size: 11px; padding: 3px 8px; border-radius: 20px; font-weight: 600; }
+.badge-green { background: var(--green-light); color: var(--green); }
+.badge-red { background: var(--red-light); color: var(--red); }
+.badge-amber { background: var(--amber-light); color: var(--amber); }
+.badge-blue { background: var(--blue-light); color: var(--blue); }
+.call-btn { width: 42px; height: 42px; border-radius: 50%; background: var(--green-light); border: none; display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 18px; flex-shrink: 0; }
+
+/* STATS GRID */
+.stats { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 14px; }
+.stat-card { background: white; border-radius: 14px; padding: 14px; border: 1px solid var(--border); }
+.stat-label { font-size: 11px; color: var(--muted); margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.5px; }
+.stat-value { font-size: 22px; font-weight: 700; line-height: 1; }
+.stat-sub { font-size: 11px; color: var(--muted); margin-top: 4px; }
+.battery-row { display: flex; align-items: center; gap: 8px; margin-top: 6px; }
+.battery-track { flex: 1; height: 7px; background: #eee; border-radius: 4px; overflow: hidden; }
+.battery-fill { height: 100%; border-radius: 4px; transition: width 1s, background 1s; }
+
+/* MAP */
+.map-box { background: white; border-radius: 16px; border: 1px solid var(--border); overflow: hidden; margin-bottom: 14px; }
+.map-header { padding: 12px 16px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #f0f0f0; }
+.map-title { font-size: 14px; font-weight: 700; }
+.map-actions { display: flex; gap: 8px; }
+.map-btn { font-size: 11px; padding: 4px 10px; border-radius: 8px; border: 1px solid var(--border); background: white; cursor: pointer; color: var(--blue); font-weight: 600; }
+#map { height: 240px; z-index: 1; }
+.map-footer { padding: 10px 16px; background: var(--blue-light); display: flex; align-items: center; gap: 8px; }
+.map-coords { font-size: 12px; color: var(--blue); font-weight: 500; flex: 1; }
+.map-accuracy { font-size: 11px; color: var(--muted); }
+
+/* SPEED & MOVEMENT */
+.movement-row { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; margin-bottom: 14px; }
+.move-card { background: white; border-radius: 14px; padding: 12px; border: 1px solid var(--border); text-align: center; }
+.move-icon { font-size: 20px; margin-bottom: 4px; }
+.move-val { font-size: 16px; font-weight: 700; }
+.move-label { font-size: 10px; color: var(--muted); margin-top: 2px; text-transform: uppercase; }
+
+/* TIMELINE */
+.section-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
+.section-title { font-size: 15px; font-weight: 700; }
+.see-all { font-size: 12px; color: var(--blue); cursor: pointer; background: none; border: none; }
+
+/* TABS */
+.tabs { display: flex; background: white; border-radius: 12px; border: 1px solid var(--border); padding: 4px; gap: 4px; margin-bottom: 14px; }
+.tab { flex: 1; padding: 8px; text-align: center; font-size: 12px; border-radius: 9px; border: none; cursor: pointer; background: transparent; color: var(--muted); font-weight: 600; transition: all 0.2s; }
+.tab.active { background: var(--blue); color: white; }
+
+/* ALERTS */
+.alerts { display: flex; flex-direction: column; gap: 8px; margin-bottom: 14px; }
+.alert-item { display: flex; align-items: center; gap: 12px; padding: 12px 14px; background: white; border-radius: 12px; border: 1px solid var(--border); transition: transform 0.1s; }
+.alert-item:active { transform: scale(0.98); }
+.alert-icon { width: 38px; height: 38px; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 16px; flex-shrink: 0; }
+.alert-body { flex: 1; }
+.alert-title { font-size: 13px; font-weight: 600; margin-bottom: 2px; }
+.alert-desc { font-size: 11px; color: var(--muted); }
+.alert-time { font-size: 11px; color: var(--muted); white-space: nowrap; }
+
+/* SOS */
+.sos-section { margin-bottom: 14px; }
+.sos-btn { width: 100%; padding: 18px; background: var(--red); color: white; border: none; border-radius: 16px; font-size: 17px; font-weight: 800; cursor: pointer; letter-spacing: 1px; position: relative; overflow: hidden; }
+.sos-btn:active { background: #791F1F; transform: scale(0.98); }
+.sos-btn::after { content: ''; position: absolute; inset: 0; background: rgba(255,255,255,0.1); opacity: 0; transition: opacity 0.2s; }
+.sos-btn:active::after { opacity: 1; }
+.sos-sub { text-align: center; font-size: 11px; color: var(--muted); margin-top: 6px; }
+
+/* GEOFENCE CARD */
+.geo-card { background: white; border-radius: 16px; border: 1px solid var(--border); padding: 16px; margin-bottom: 14px; }
+.geo-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
+.geo-title { font-size: 14px; font-weight: 700; }
+.geo-toggle { position: relative; width: 44px; height: 26px; }
+.geo-toggle input { opacity: 0; width: 0; height: 0; }
+.geo-slider { position: absolute; inset: 0; background: #ccc; border-radius: 13px; transition: 0.3s; cursor: pointer; }
+.geo-slider:before { content: ''; position: absolute; width: 20px; height: 20px; left: 3px; bottom: 3px; background: white; border-radius: 50%; transition: 0.3s; }
+input:checked + .geo-slider { background: var(--blue); }
+input:checked + .geo-slider:before { transform: translateX(18px); }
+.geo-zones { display: flex; flex-direction: column; gap: 8px; }
+.geo-zone { display: flex; align-items: center; gap: 10px; padding: 10px 12px; border-radius: 10px; background: var(--gray); }
+.geo-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
+.geo-zone-name { font-size: 13px; font-weight: 600; flex: 1; }
+.geo-zone-radius { font-size: 11px; color: var(--muted); }
+.geo-zone-status { font-size: 11px; font-weight: 600; }
+
+/* BOTTOM NAV */
+.bottom-nav { position: fixed; bottom: 0; left: 0; right: 0; background: white; border-top: 1px solid var(--border); display: flex; z-index: 100; padding-bottom: env(safe-area-inset-bottom); }
+.nav-item { flex: 1; display: flex; flex-direction: column; align-items: center; padding: 10px 0 8px; cursor: pointer; border: none; background: none; color: var(--muted); font-size: 10px; gap: 3px; transition: color 0.2s; }
+.nav-item.active { color: var(--blue); }
+.nav-icon { font-size: 20px; }
+.nav-badge { position: relative; }
+.nav-badge-dot { position: absolute; top: -2px; right: -6px; width: 8px; height: 8px; background: var(--red); border-radius: 50%; border: 1.5px solid white; }
+
+/* TOAST */
+.toast { position: fixed; bottom: 80px; left: 50%; transform: translateX(-50%); background: #222; color: white; padding: 10px 20px; border-radius: 20px; font-size: 13px; z-index: 999; opacity: 0; transition: opacity 0.3s; white-space: nowrap; }
+.toast.show { opacity: 1; }
+
+/* FOOTER */
+.footer { text-align: center; font-size: 11px; color: #ccc; padding: 10px 0 80px; }
+
+/* LOADING */
+.loading { display: flex; align-items: center; justify-content: center; gap: 8px; padding: 20px; color: var(--muted); font-size: 13px; }
+.spinner { width: 16px; height: 16px; border: 2px solid var(--border); border-top-color: var(--blue); border-radius: 50%; animation: spin 0.8s linear infinite; }
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* WEATHER WIDGET */
+.weather-card { background: linear-gradient(135deg, #185FA5, #0C447C); color: white; border-radius: 16px; padding: 16px; margin-bottom: 14px; display: flex; justify-content: space-between; align-items: center; }
+.weather-left .temp { font-size: 36px; font-weight: 700; }
+.weather-left .desc { font-size: 13px; opacity: 0.8; }
+.weather-left .location { font-size: 11px; opacity: 0.6; margin-top: 4px; }
+.weather-right { text-align: right; font-size: 36px; }
+.weather-details { display: flex; gap: 16px; margin-top: 12px; border-top: 1px solid rgba(255,255,255,0.2); padding-top: 12px; }
+.weather-detail { font-size: 11px; opacity: 0.8; }
+.weather-detail span { display: block; font-weight: 700; font-size: 13px; opacity: 1; }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="header-left">
+    <div class="app-icon">🛡️</div>
+    <div>
+      <h1>GuardianTrack</h1>
+      <div class="header-sub" id="header-time">Loading...</div>
+    </div>
+  </div>
+  <div class="live-pill">
+    <div class="live-dot"></div>
+    <span id="live-label">Live</span>
+  </div>
+</div>
+
+<div class="container">
+
+  <!-- PARENT CARD -->
+  <div class="parent-card">
+    <div class="parent-avatar" id="parent-initial">F</div>
+    <div class="parent-info">
+      <div class="parent-name" id="parent-name">Father</div>
+      <div class="parent-phone" id="parent-phone">Loading...</div>
+      <div class="parent-badges">
+        <span class="badge badge-green" id="status-badge">Online</span>
+        <span class="badge badge-blue" id="geo-badge">In safe zone</span>
+        <span class="badge badge-amber" id="speed-badge">Walking</span>
+      </div>
+    </div>
+    <button class="call-btn" onclick="callParent()" title="Call parent">📞</button>
+  </div>
+
+  <!-- STATS -->
+  <div class="stats">
+    <div class="stat-card">
+      <div class="stat-label">Battery</div>
+      <div class="stat-value" id="bat-val" style="color:var(--green)">--%</div>
+      <div class="battery-row">
+        <div class="battery-track"><div class="battery-fill" id="bat-fill" style="width:0%;background:var(--green-bg)"></div></div>
+      </div>
+      <div class="stat-sub" id="bat-status">Charging</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">Last Seen</div>
+      <div class="stat-value" id="last-seen" style="color:var(--blue);font-size:18px;">--</div>
+      <div class="stat-sub" id="last-seen-abs">--</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">Distance</div>
+      <div class="stat-value" id="distance-val" style="color:var(--blue);">--</div>
+      <div class="stat-sub">from home</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">Today alerts</div>
+      <div class="stat-value" id="alert-count" style="color:var(--amber);">0</div>
+      <div class="stat-sub">total events</div>
+    </div>
+  </div>
+
+  <!-- MOVEMENT ROW -->
+  <div class="movement-row">
+    <div class="move-card">
+      <div class="move-icon">🚶</div>
+      <div class="move-val" id="move-speed">0</div>
+      <div class="move-label">km/h</div>
+    </div>
+    <div class="move-card">
+      <div class="move-icon">📍</div>
+      <div class="move-val" id="move-updates">0</div>
+      <div class="move-label">updates</div>
+    </div>
+    <div class="move-card">
+      <div class="move-icon">⏱️</div>
+      <div class="move-val" id="move-uptime">0m</div>
+      <div class="move-label">online</div>
+    </div>
+  </div>
+
+  <!-- MAP -->
+  <div class="map-box">
+    <div class="map-header">
+      <span class="map-title">📍 Live Location</span>
+      <div class="map-actions">
+        <button class="map-btn" onclick="centerMap()">Center</button>
+        <button class="map-btn" onclick="openMaps()">Open Maps</button>
+      </div>
+    </div>
+    <div id="map"></div>
+    <div class="map-footer">
+      <div class="map-coords" id="map-coords">Fetching GPS...</div>
+      <div class="map-accuracy" id="map-accuracy">±--m</div>
+    </div>
+  </div>
+
+  <!-- WEATHER -->
+  <div class="weather-card" id="weather-card">
+    <div class="weather-left">
+      <div class="temp" id="w-temp">--°C</div>
+      <div class="desc" id="w-desc">Loading weather...</div>
+      <div class="location" id="w-loc">Chennai, TN</div>
+      <div class="weather-details">
+        <div class="weather-detail">Humidity<span id="w-hum">--%</span></div>
+        <div class="weather-detail">Wind<span id="w-wind">-- km/h</span></div>
+        <div class="weather-detail">Feels<span id="w-feels">--°C</span></div>
+      </div>
+    </div>
+    <div class="weather-right" id="w-icon">🌤️</div>
+  </div>
+
+  <!-- GEOFENCE -->
+  <div class="geo-card">
+    <div class="geo-header">
+      <span class="geo-title">🔵 Geofence Zones</span>
+      <label class="geo-toggle"><input type="checkbox" checked id="geo-enabled" onchange="toggleGeo()"><span class="geo-slider"></span></label>
+    </div>
+    <div class="geo-zones">
+      <div class="geo-zone">
+        <div class="geo-dot" style="background:#3B6D11"></div>
+        <div class="geo-zone-name">Home</div>
+        <div class="geo-zone-radius">500m radius</div>
+        <div class="geo-zone-status" style="color:var(--green)" id="home-status">Inside ✓</div>
+      </div>
+      <div class="geo-zone">
+        <div class="geo-dot" style="background:#185FA5"></div>
+        <div class="geo-zone-name">Work</div>
+        <div class="geo-zone-radius">300m radius</div>
+        <div class="geo-zone-status" style="color:var(--muted)" id="work-status">Outside</div>
+      </div>
+      <div class="geo-zone">
+        <div class="geo-dot" style="background:#BA7517"></div>
+        <div class="geo-zone-name">Hospital</div>
+        <div class="geo-zone-radius">200m radius</div>
+        <div class="geo-zone-status" style="color:var(--muted)" id="hosp-status">Outside</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- TABS + ALERTS -->
+  <div class="tabs">
+    <button class="tab active" onclick="showTab('alerts',this)">🔔 Alerts</button>
+    <button class="tab" onclick="showTab('history',this)">📜 History</button>
+    <button class="tab" onclick="showTab('settings',this)">⚙️ Settings</button>
+  </div>
+
+  <div id="tab-alerts">
+    <div class="alerts" id="alerts-list">
+      <div class="loading"><div class="spinner"></div>Loading alerts...</div>
+    </div>
+  </div>
+
+  <div id="tab-history" style="display:none;">
+    <div class="alerts" id="history-list">
+      <div class="loading"><div class="spinner"></div>Loading history...</div>
+    </div>
+  </div>
+
+  <div id="tab-settings" style="display:none;">
+    <div style="background:white;border-radius:16px;border:1px solid var(--border);overflow:hidden;margin-bottom:14px;">
+      <div style="padding:14px 16px;border-bottom:1px solid #f0f0f0;font-weight:700;font-size:14px;">Account</div>
+      <div style="padding:14px 16px;border-bottom:1px solid #f0f0f0;display:flex;justify-content:space-between;align-items:center;">
+        <div>
+          <div style="font-size:13px;font-weight:600;" id="s-name">--</div>
+          <div style="font-size:11px;color:var(--muted);" id="s-phone">--</div>
+        </div>
+        <button onclick="logout()" style="font-size:12px;color:var(--red);background:var(--red-light);border:none;padding:6px 12px;border-radius:8px;cursor:pointer;font-weight:600;">Logout</button>
+      </div>
+      <div style="padding:14px 16px;border-bottom:1px solid #f0f0f0;display:flex;justify-content:space-between;align-items:center;">
+        <div style="font-size:13px;">SMS Alerts (Fast2SMS)</div>
+        <label class="geo-toggle"><input type="checkbox" checked><span class="geo-slider"></span></label>
+      </div>
+      <div style="padding:14px 16px;display:flex;justify-content:space-between;align-items:center;">
+        <div style="font-size:13px;">Auto-refresh (30s)</div>
+        <label class="geo-toggle"><input type="checkbox" checked id="auto-refresh"><span class="geo-slider"></span></label>
+      </div>
+    </div>
+    <div style="background:white;border-radius:16px;border:1px solid var(--border);overflow:hidden;margin-bottom:14px;">
+      <div style="padding:14px 16px;border-bottom:1px solid #f0f0f0;font-weight:700;font-size:14px;">Backend</div>
+      <div style="padding:14px 16px;font-size:12px;color:var(--muted);word-break:break-all;">guardiantrack-backend.onrender.com</div>
+    </div>
+  </div>
+
+  <!-- SOS -->
+  <div class="sos-section">
+    <button class="sos-btn" onclick="triggerSOS()">🆘 &nbsp; SOS — EMERGENCY ALERT</button>
+    <div class="sos-sub">Hold to send emergency alert with live location to all contacts</div>
+  </div>
+
+  <div class="footer">GuardianTrack v2.0 &nbsp;•&nbsp; Built with ❤️ for family safety</div>
+</div>
+
+<div class="bottom-nav">
+  <button class="nav-item active" onclick="scrollToTop()">
+    <span class="nav-icon">🏠</span><span>Home</span>
+  </button>
+  <button class="nav-item" onclick="centerMap()">
+    <span class="nav-icon">📍</span><span>Map</span>
+  </button>
+  <button class="nav-item nav-badge" onclick="showTabByName('alerts')">
+    <span class="nav-icon">🔔<span class="nav-badge-dot" id="alert-dot" style="display:none"></span></span>
+    <span>Alerts</span>
+  </button>
+  <button class="nav-item" onclick="showTabByName('settings')">
+    <span class="nav-icon">⚙️</span><span>Settings</span>
+  </button>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script>
+const BASE = 'https://guardiantrack-backend.onrender.com';
+let token = localStorage.getItem('gt_token');
+let map, marker, circle, refreshTimer;
+let locationHistory = [];
+let updateCount = 0;
+let startTime = Date.now();
+
+// TIME
+function updateClock() {
+  const now = new Date();
+  document.getElementById('header-time').textContent = now.toLocaleTimeString('en-IN', {hour:'2-digit',minute:'2-digit'}) + ' — ' + now.toLocaleDateString('en-IN',{weekday:'short',day:'numeric',month:'short'});
+}
+setInterval(updateClock, 1000); updateClock();
+
+// UPTIME
+setInterval(() => {
+  const mins = Math.floor((Date.now() - startTime) / 60000);
+  document.getElementById('move-uptime').textContent = mins < 60 ? mins+'m' : Math.floor(mins/60)+'h '+( mins%60)+'m';
+}, 10000);
+
+// MAP INIT
+function initMap(lat, lng) {
+  if (map) { map.setView([lat, lng], 15); return; }
+  map = L.map('map', { zoomControl: true, attributionControl: false }).setView([lat, lng], 15);
+  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
+  const icon = L.divIcon({
+    html: '<div style="width:36px;height:36px;border-radius:50%;background:#185FA5;border:3px solid white;display:flex;align-items:center;justify-content:center;color:white;font-weight:700;font-size:14px;box-shadow:0 2px 8px rgba(0,0,0,0.3);">F</div>',
+    iconSize: [36,36], iconAnchor: [18,18], className: ''
+  });
+  marker = L.marker([lat, lng], {icon}).addTo(map).bindPopup('<b>Father</b><br>Live location');
+  circle = L.circle([lat, lng], {radius: 500, color: '#185FA5', fillColor: '#E6F1FB', fillOpacity: 0.2, weight: 2, dashArray: '6'}).addTo(map);
+}
+
+function centerMap() {
+  if (map && marker) { map.setView(marker.getLatLng(), 15); showToast('Map centered'); }
+}
+
+function openMaps() {
+  if (marker) {
+    const {lat, lng} = marker.getLatLng();
+    window.open('https://maps.google.com/?q='+lat+','+lng, '_blank');
+  }
+}
+
+// WEATHER (Open-Meteo — free, no key)
+async function fetchWeather(lat, lng) {
+  try {
+    const res = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lng}&current_weather=true&hourly=relativehumidity_2m,apparent_temperature,windspeed_10m&timezone=auto`);
+    const d = await res.json();
+    const w = d.current_weather;
+    const code = w.weathercode;
+    const icons = {0:'☀️',1:'🌤️',2:'⛅',3:'☁️',45:'🌫️',48:'🌫️',51:'🌦️',61:'🌧️',71:'❄️',80:'🌧️',95:'⛈️'};
+    const descs = {0:'Clear sky',1:'Mainly clear',2:'Partly cloudy',3:'Overcast',45:'Foggy',51:'Light drizzle',61:'Rain',71:'Snow',80:'Showers',95:'Thunderstorm'};
+    document.getElementById('w-temp').textContent = Math.round(w.temperature) + '°C';
+    document.getElementById('w-desc').textContent = descs[code] || 'Clear';
+    document.getElementById('w-icon').textContent = icons[code] || '🌤️';
+    document.getElementById('w-wind').textContent = Math.round(w.windspeed) + ' km/h';
+    const hi = d.hourly;
+    const idx = new Date().getHours();
+    if (hi) {
+      document.getElementById('w-hum').textContent = (hi.relativehumidity_2m?.[idx] || '--') + '%';
+      document.getElementById('w-feels').textContent = Math.round(hi.apparent_temperature?.[idx] || w.temperature) + '°C';
+    }
+  } catch(e) {}
+}
+
+// TIME AGO
+function timeAgo(dateStr) {
+  const diff = Math.floor((Date.now() - new Date(dateStr)) / 1000);
+  if (diff < 60) return diff + 's ago';
+  if (diff < 3600) return Math.floor(diff/60) + 'm ago';
+  return Math.floor(diff/3600) + 'h ago';
+}
+
+// FETCH LOCATION
+async function fetchLocation() {
+  if (!token) { login(); return; }
+  try {
+    const res = await fetch(BASE + '/api/parents', { headers: { Authorization: 'Bearer ' + token } });
+    if (res.status === 401) { logout(); return; }
+    const data = await res.json();
+    if (data && data.length > 0) {
+      const p = data[0];
+      updateCount++;
+      document.getElementById('move-updates').textContent = updateCount;
+      document.getElementById('parent-name').textContent = p.name || 'Father';
+      document.getElementById('parent-initial').textContent = (p.name || 'F')[0].toUpperCase();
+      document.getElementById('parent-phone').textContent = p.phone || '--';
+      document.getElementById('s-name').textContent = p.name || '--';
+      document.getElementById('s-phone').textContent = p.phone || '--';
+
+      // Battery
+      const bat = p.batteryLevel || 0;
+      document.getElementById('bat-val').textContent = bat + '%';
+      document.getElementById('bat-fill').style.width = bat + '%';
+      const batColor = bat < 20 ? '#E24B4A' : bat < 50 ? '#EF9F27' : '#639922';
+      document.getElementById('bat-fill').style.background = batColor;
+      document.getElementById('bat-val').style.color = batColor;
+      document.getElementById('bat-status').textContent = bat < 20 ? 'Low battery!' : bat < 50 ? 'Medium' : 'Good';
+
+      // Status
+      const online = p.isOnline;
+      document.getElementById('status-badge').textContent = online ? 'Online' : 'Offline';
+      document.getElementById('status-badge').className = 'badge ' + (online ? 'badge-green' : 'badge-red');
+      document.getElementById('live-label').textContent = online ? 'Live' : 'Offline';
+
+      // Last seen
+      if (p.lastSeen) {
+        document.getElementById('last-seen').textContent = timeAgo(p.lastSeen);
+        document.getElementById('last-seen-abs').textContent = new Date(p.lastSeen).toLocaleTimeString('en-IN',{hour:'2-digit',minute:'2-digit'});
+      }
+
+      // Location
+      const loc = p.lastLocation;
+      if (loc && loc.lat && loc.lng) {
+        initMap(loc.lat, loc.lng);
+        if (marker) { marker.setLatLng([loc.lat, loc.lng]); circle.setLatLng([loc.lat, loc.lng]); }
+        document.getElementById('map-coords').textContent = loc.lat.toFixed(5) + '° N,  ' + loc.lng.toFixed(5) + '° E';
+        fetchWeather(loc.lat, loc.lng);
+
+        // Distance from default home (Chennai center)
+        const homeLat = 13.0827, homeLng = 80.2707;
+        const R = 6371000;
+        const dLat = (loc.lat - homeLat) * Math.PI/180;
+        const dLng = (loc.lng - homeLng) * Math.PI/180;
+        const a = Math.sin(dLat/2)**2 + Math.cos(homeLat*Math.PI/180)*Math.cos(loc.lat*Math.PI/180)*Math.sin(dLng/2)**2;
+        const dist = R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+        document.getElementById('distance-val').textContent = dist < 1000 ? Math.round(dist)+'m' : (dist/1000).toFixed(1)+'km';
+      }
+
+      // Geofence
+      const inside = p.insideGeofence;
+      document.getElementById('geo-badge').textContent = inside ? 'In safe zone' : 'Outside zone';
+      document.getElementById('geo-badge').className = 'badge ' + (inside ? 'badge-blue' : 'badge-red');
+      document.getElementById('home-status').textContent = inside ? 'Inside ✓' : 'Outside';
+      document.getElementById('home-status').style.color = inside ? 'var(--green)' : 'var(--red)';
+    }
+    fetchAlerts();
+  } catch(e) {
+    showToast('Connection error — retrying');
+  }
+}
+
+// ALERTS
+async function fetchAlerts() {
+  if (!token) return;
+  try {
+    const res = await fetch(BASE + '/api/alerts', { headers: { Authorization: 'Bearer ' + token } });
+    const data = await res.json();
+    const alerts = Array.isArray(data) ? data : (data.alerts || []);
+    document.getElementById('alert-count').textContent = alerts.length;
+    if (alerts.length > 0) document.getElementById('alert-dot').style.display = 'block';
+    const iconMap = { sos: {icon:'🆘', cls:'icon-sos'}, geofence: {icon:'🔵', cls:'icon-geo'}, battery: {icon:'🔋', cls:'icon-bat'}, location: {icon:'📍', cls:'icon-loc'} };
+    const html = alerts.slice(0,10).map(a => {
+      const ic = iconMap[a.type] || {icon:'🔔', cls:'icon-bat'};
+      return `<div class="alert-item"><div class="alert-icon ${ic.cls}">${ic.icon}</div><div class="alert-body"><div class="alert-title">${a.message||a.type}</div><div class="alert-desc">${a.description||''}</div></div><div class="alert-time">${timeAgo(a.createdAt||a.timestamp)}</div></div>`;
+    }).join('') || '<div class="alert-item"><div class="alert-icon icon-bat">✓</div><div class="alert-body"><div class="alert-title">No alerts</div><div class="alert-desc">Everything looks good</div></div></div>';
+    document.getElementById('alerts-list').innerHTML = html;
+
+    const histHtml = alerts.slice(0,20).map(a => {
+      return `<div class="alert-item"><div class="alert-icon icon-loc">📍</div><div class="alert-body"><div class="alert-title">${a.message||a.type}</div><div class="alert-desc">${new Date(a.createdAt||a.timestamp).toLocaleString('en-IN')}</div></div></div>`;
+    }).join('') || '<div class="alert-item"><div class="alert-icon icon-loc">📜</div><div class="alert-body"><div class="alert-title">No history yet</div></div></div>';
+    document.getElementById('history-list').innerHTML = histHtml;
+  } catch(e) {}
+}
+
+// TABS
+function showTab(name, btn) {
+  ['alerts','history','settings'].forEach(t => document.getElementById('tab-'+t).style.display = t===name?'block':'none');
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  btn.classList.add('active');
+}
+function showTabByName(name) {
+  ['alerts','history','settings'].forEach(t => document.getElementById('tab-'+t).style.display = t===name?'block':'none');
+  document.querySelectorAll('.tab').forEach((t,i) => t.classList.toggle('active', ['alerts','history','settings'][i]===name));
+  document.querySelector('.container').scrollIntoView({behavior:'smooth'});
+}
+
+// SOS
+async function triggerSOS() {
+  if (!confirm('Send SOS emergency alert to all contacts?')) return;
+  try {
+    await fetch(BASE + '/api/sos', { method:'POST', headers:{ Authorization:'Bearer '+token, 'Content-Type':'application/json' } });
+    showToast('SOS sent successfully!');
+  } catch(e) { showToast('SOS failed — check connection'); }
+}
+
+// UTILS
+function callParent() { const p = document.getElementById('parent-phone').textContent; if(p&&p!=='--') window.open('tel:'+p); else showToast('No phone number found'); }
+function toggleGeo() { showToast(document.getElementById('geo-enabled').checked ? 'Geofence enabled' : 'Geofence disabled'); }
+function scrollToTop() { window.scrollTo({top:0,behavior:'smooth'}); }
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg; t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2500);
+}
+
+// LOGIN / LOGOUT
+async function login() {
+  const phone = prompt('Enter your phone number:');
+  if (!phone) return;
+  const pass = prompt('Enter your password:');
+  if (!pass) return;
+  try {
+    const res = await fetch(BASE + '/api/auth/login', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({phone, password:pass}) });
+    const data = await res.json();
+    if (data.token) { localStorage.setItem('gt_token', data.token); token = data.token; fetchLocation(); showToast('Logged in!'); }
+    else alert('Login failed: ' + (data.message || 'Check credentials'));
+  } catch(e) { alert('Connection error'); }
+}
+function logout() {
+  if (!confirm('Logout?')) return;
+  localStorage.removeItem('gt_token'); token = null;
+  showToast('Logged out'); setTimeout(() => login(), 1000);
+}
+
+// INIT
+if (!token) login();
+else { fetchLocation(); }
+refreshTimer = setInterval(() => { if (document.getElementById('auto-refresh').checked) fetchLocation(); }, 30000);
+
+// Init map with Chennai default
+setTimeout(() => { if (!map) initMap(13.0827, 80.2707); }, 1000);
+</script>
+</body>
+</html>
