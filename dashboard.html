@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8"/>
@@ -151,7 +151,7 @@ input:checked + .geo-slider:before { transform: translateX(18px); }
 
 <div class="header">
   <div class="header-left">
-    <div class="app-icon">🛡️</div>
+    <div class="app-icon">ðŸ›¡ï¸</div>
     <div>
       <h1>GuardianTrack</h1>
       <div class="header-sub" id="header-time">Loading...</div>
@@ -177,7 +177,7 @@ input:checked + .geo-slider:before { transform: translateX(18px); }
         <span class="badge badge-amber" id="speed-badge">Walking</span>
       </div>
     </div>
-    <button class="call-btn" onclick="callParent()" title="Call parent">📞</button>
+    <button class="call-btn" onclick="callParent()" title="Call parent">ðŸ“ž</button>
   </div>
 
   <!-- STATS -->
@@ -210,17 +210,17 @@ input:checked + .geo-slider:before { transform: translateX(18px); }
   <!-- MOVEMENT ROW -->
   <div class="movement-row">
     <div class="move-card">
-      <div class="move-icon">🚶</div>
+      <div class="move-icon">ðŸš¶</div>
       <div class="move-val" id="move-speed">0</div>
       <div class="move-label">km/h</div>
     </div>
     <div class="move-card">
-      <div class="move-icon">📍</div>
+      <div class="move-icon">ðŸ“</div>
       <div class="move-val" id="move-updates">0</div>
       <div class="move-label">updates</div>
     </div>
     <div class="move-card">
-      <div class="move-icon">⏱️</div>
+      <div class="move-icon">â±ï¸</div>
       <div class="move-val" id="move-uptime">0m</div>
       <div class="move-label">online</div>
     </div>
@@ -229,7 +229,7 @@ input:checked + .geo-slider:before { transform: translateX(18px); }
   <!-- MAP -->
   <div class="map-box">
     <div class="map-header">
-      <span class="map-title">📍 Live Location</span>
+      <span class="map-title">ðŸ“ Live Location</span>
       <div class="map-actions">
         <button class="map-btn" onclick="centerMap()">Center</button>
         <button class="map-btn" onclick="openMaps()">Open Maps</button>
@@ -238,29 +238,29 @@ input:checked + .geo-slider:before { transform: translateX(18px); }
     <div id="map"></div>
     <div class="map-footer">
       <div class="map-coords" id="map-coords">Fetching GPS...</div>
-      <div class="map-accuracy" id="map-accuracy">±--m</div>
+      <div class="map-accuracy" id="map-accuracy">Â±--m</div>
     </div>
   </div>
 
   <!-- WEATHER -->
   <div class="weather-card" id="weather-card">
     <div class="weather-left">
-      <div class="temp" id="w-temp">--°C</div>
+      <div class="temp" id="w-temp">--Â°C</div>
       <div class="desc" id="w-desc">Loading weather...</div>
       <div class="location" id="w-loc">Chennai, TN</div>
       <div class="weather-details">
         <div class="weather-detail">Humidity<span id="w-hum">--%</span></div>
         <div class="weather-detail">Wind<span id="w-wind">-- km/h</span></div>
-        <div class="weather-detail">Feels<span id="w-feels">--°C</span></div>
+        <div class="weather-detail">Feels<span id="w-feels">--Â°C</span></div>
       </div>
     </div>
-    <div class="weather-right" id="w-icon">🌤️</div>
+    <div class="weather-right" id="w-icon">ðŸŒ¤ï¸</div>
   </div>
 
   <!-- GEOFENCE -->
   <div class="geo-card">
     <div class="geo-header">
-      <span class="geo-title">🔵 Geofence Zones</span>
+      <span class="geo-title">ðŸ”µ Geofence Zones</span>
       <label class="geo-toggle"><input type="checkbox" checked id="geo-enabled" onchange="toggleGeo()"><span class="geo-slider"></span></label>
     </div>
     <div class="geo-zones">
@@ -268,7 +268,7 @@ input:checked + .geo-slider:before { transform: translateX(18px); }
         <div class="geo-dot" style="background:#3B6D11"></div>
         <div class="geo-zone-name">Home</div>
         <div class="geo-zone-radius">500m radius</div>
-        <div class="geo-zone-status" style="color:var(--green)" id="home-status">Inside ✓</div>
+        <div class="geo-zone-status" style="color:var(--green)" id="home-status">Inside âœ“</div>
       </div>
       <div class="geo-zone">
         <div class="geo-dot" style="background:#185FA5"></div>
@@ -287,9 +287,9 @@ input:checked + .geo-slider:before { transform: translateX(18px); }
 
   <!-- TABS + ALERTS -->
   <div class="tabs">
-    <button class="tab active" onclick="showTab('alerts',this)">🔔 Alerts</button>
-    <button class="tab" onclick="showTab('history',this)">📜 History</button>
-    <button class="tab" onclick="showTab('settings',this)">⚙️ Settings</button>
+    <button class="tab active" onclick="showTab('alerts',this)">ðŸ”” Alerts</button>
+    <button class="tab" onclick="showTab('history',this)">ðŸ“œ History</button>
+    <button class="tab" onclick="showTab('settings',this)">âš™ï¸ Settings</button>
   </div>
 
   <div id="tab-alerts">
@@ -331,26 +331,26 @@ input:checked + .geo-slider:before { transform: translateX(18px); }
 
   <!-- SOS -->
   <div class="sos-section">
-    <button class="sos-btn" onclick="triggerSOS()">🆘 &nbsp; SOS — EMERGENCY ALERT</button>
+    <button class="sos-btn" onclick="triggerSOS()">ðŸ†˜ &nbsp; SOS â€” EMERGENCY ALERT</button>
     <div class="sos-sub">Hold to send emergency alert with live location to all contacts</div>
   </div>
 
-  <div class="footer">GuardianTrack v2.0 &nbsp;•&nbsp; Built with ❤️ for family safety</div>
+  <div class="footer">GuardianTrack v2.0 &nbsp;â€¢&nbsp; Built with â¤ï¸ for family safety</div>
 </div>
 
 <div class="bottom-nav">
   <button class="nav-item active" onclick="scrollToTop()">
-    <span class="nav-icon">🏠</span><span>Home</span>
+    <span class="nav-icon">ðŸ </span><span>Home</span>
   </button>
   <button class="nav-item" onclick="centerMap()">
-    <span class="nav-icon">📍</span><span>Map</span>
+    <span class="nav-icon">ðŸ“</span><span>Map</span>
   </button>
   <button class="nav-item nav-badge" onclick="showTabByName('alerts')">
-    <span class="nav-icon">🔔<span class="nav-badge-dot" id="alert-dot" style="display:none"></span></span>
+    <span class="nav-icon">ðŸ””<span class="nav-badge-dot" id="alert-dot" style="display:none"></span></span>
     <span>Alerts</span>
   </button>
   <button class="nav-item" onclick="showTabByName('settings')">
-    <span class="nav-icon">⚙️</span><span>Settings</span>
+    <span class="nav-icon">âš™ï¸</span><span>Settings</span>
   </button>
 </div>
 
@@ -368,7 +368,7 @@ let startTime = Date.now();
 // TIME
 function updateClock() {
   const now = new Date();
-  document.getElementById('header-time').textContent = now.toLocaleTimeString('en-IN', {hour:'2-digit',minute:'2-digit'}) + ' — ' + now.toLocaleDateString('en-IN',{weekday:'short',day:'numeric',month:'short'});
+  document.getElementById('header-time').textContent = now.toLocaleTimeString('en-IN', {hour:'2-digit',minute:'2-digit'}) + ' â€” ' + now.toLocaleDateString('en-IN',{weekday:'short',day:'numeric',month:'short'});
 }
 setInterval(updateClock, 1000); updateClock();
 
@@ -402,24 +402,24 @@ function openMaps() {
   }
 }
 
-// WEATHER (Open-Meteo — free, no key)
+// WEATHER (Open-Meteo â€” free, no key)
 async function fetchWeather(lat, lng) {
   try {
     const res = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lng}&current_weather=true&hourly=relativehumidity_2m,apparent_temperature,windspeed_10m&timezone=auto`);
     const d = await res.json();
     const w = d.current_weather;
     const code = w.weathercode;
-    const icons = {0:'☀️',1:'🌤️',2:'⛅',3:'☁️',45:'🌫️',48:'🌫️',51:'🌦️',61:'🌧️',71:'❄️',80:'🌧️',95:'⛈️'};
+    const icons = {0:'â˜€ï¸',1:'ðŸŒ¤ï¸',2:'â›…',3:'â˜ï¸',45:'ðŸŒ«ï¸',48:'ðŸŒ«ï¸',51:'ðŸŒ¦ï¸',61:'ðŸŒ§ï¸',71:'â„ï¸',80:'ðŸŒ§ï¸',95:'â›ˆï¸'};
     const descs = {0:'Clear sky',1:'Mainly clear',2:'Partly cloudy',3:'Overcast',45:'Foggy',51:'Light drizzle',61:'Rain',71:'Snow',80:'Showers',95:'Thunderstorm'};
-    document.getElementById('w-temp').textContent = Math.round(w.temperature) + '°C';
+    document.getElementById('w-temp').textContent = Math.round(w.temperature) + 'Â°C';
     document.getElementById('w-desc').textContent = descs[code] || 'Clear';
-    document.getElementById('w-icon').textContent = icons[code] || '🌤️';
+    document.getElementById('w-icon').textContent = icons[code] || 'ðŸŒ¤ï¸';
     document.getElementById('w-wind').textContent = Math.round(w.windspeed) + ' km/h';
     const hi = d.hourly;
     const idx = new Date().getHours();
     if (hi) {
       document.getElementById('w-hum').textContent = (hi.relativehumidity_2m?.[idx] || '--') + '%';
-      document.getElementById('w-feels').textContent = Math.round(hi.apparent_temperature?.[idx] || w.temperature) + '°C';
+      document.getElementById('w-feels').textContent = Math.round(hi.apparent_temperature?.[idx] || w.temperature) + 'Â°C';
     }
   } catch(e) {}
 }
@@ -475,7 +475,7 @@ async function fetchLocation() {
       if (loc && loc.lat && loc.lng) {
         initMap(loc.lat, loc.lng);
         if (marker) { marker.setLatLng([loc.lat, loc.lng]); circle.setLatLng([loc.lat, loc.lng]); }
-        document.getElementById('map-coords').textContent = loc.lat.toFixed(5) + '° N,  ' + loc.lng.toFixed(5) + '° E';
+        document.getElementById('map-coords').textContent = loc.lat.toFixed(5) + 'Â° N,  ' + loc.lng.toFixed(5) + 'Â° E';
         fetchWeather(loc.lat, loc.lng);
 
         // Distance from default home (Chennai center)
@@ -492,12 +492,12 @@ async function fetchLocation() {
       const inside = p.insideGeofence;
       document.getElementById('geo-badge').textContent = inside ? 'In safe zone' : 'Outside zone';
       document.getElementById('geo-badge').className = 'badge ' + (inside ? 'badge-blue' : 'badge-red');
-      document.getElementById('home-status').textContent = inside ? 'Inside ✓' : 'Outside';
+      document.getElementById('home-status').textContent = inside ? 'Inside âœ“' : 'Outside';
       document.getElementById('home-status').style.color = inside ? 'var(--green)' : 'var(--red)';
     }
     fetchAlerts();
   } catch(e) {
-    showToast('Connection error — retrying');
+    showToast('Connection error â€” retrying');
   }
 }
 
@@ -510,16 +510,16 @@ async function fetchAlerts() {
     const alerts = Array.isArray(data) ? data : (data.alerts || []);
     document.getElementById('alert-count').textContent = alerts.length;
     if (alerts.length > 0) document.getElementById('alert-dot').style.display = 'block';
-    const iconMap = { sos: {icon:'🆘', cls:'icon-sos'}, geofence: {icon:'🔵', cls:'icon-geo'}, battery: {icon:'🔋', cls:'icon-bat'}, location: {icon:'📍', cls:'icon-loc'} };
+    const iconMap = { sos: {icon:'ðŸ†˜', cls:'icon-sos'}, geofence: {icon:'ðŸ”µ', cls:'icon-geo'}, battery: {icon:'ðŸ”‹', cls:'icon-bat'}, location: {icon:'ðŸ“', cls:'icon-loc'} };
     const html = alerts.slice(0,10).map(a => {
-      const ic = iconMap[a.type] || {icon:'🔔', cls:'icon-bat'};
+      const ic = iconMap[a.type] || {icon:'ðŸ””', cls:'icon-bat'};
       return `<div class="alert-item"><div class="alert-icon ${ic.cls}">${ic.icon}</div><div class="alert-body"><div class="alert-title">${a.message||a.type}</div><div class="alert-desc">${a.description||''}</div></div><div class="alert-time">${timeAgo(a.createdAt||a.timestamp)}</div></div>`;
-    }).join('') || '<div class="alert-item"><div class="alert-icon icon-bat">✓</div><div class="alert-body"><div class="alert-title">No alerts</div><div class="alert-desc">Everything looks good</div></div></div>';
+    }).join('') || '<div class="alert-item"><div class="alert-icon icon-bat">âœ“</div><div class="alert-body"><div class="alert-title">No alerts</div><div class="alert-desc">Everything looks good</div></div></div>';
     document.getElementById('alerts-list').innerHTML = html;
 
     const histHtml = alerts.slice(0,20).map(a => {
-      return `<div class="alert-item"><div class="alert-icon icon-loc">📍</div><div class="alert-body"><div class="alert-title">${a.message||a.type}</div><div class="alert-desc">${new Date(a.createdAt||a.timestamp).toLocaleString('en-IN')}</div></div></div>`;
-    }).join('') || '<div class="alert-item"><div class="alert-icon icon-loc">📜</div><div class="alert-body"><div class="alert-title">No history yet</div></div></div>';
+      return `<div class="alert-item"><div class="alert-icon icon-loc">ðŸ“</div><div class="alert-body"><div class="alert-title">${a.message||a.type}</div><div class="alert-desc">${new Date(a.createdAt||a.timestamp).toLocaleString('en-IN')}</div></div></div>`;
+    }).join('') || '<div class="alert-item"><div class="alert-icon icon-loc">ðŸ“œ</div><div class="alert-body"><div class="alert-title">No history yet</div></div></div>';
     document.getElementById('history-list').innerHTML = histHtml;
   } catch(e) {}
 }
@@ -542,7 +542,7 @@ async function triggerSOS() {
   try {
     await fetch(BASE + '/api/sos', { method:'POST', headers:{ Authorization:'Bearer '+token, 'Content-Type':'application/json' } });
     showToast('SOS sent successfully!');
-  } catch(e) { showToast('SOS failed — check connection'); }
+  } catch(e) { showToast('SOS failed â€” check connection'); }
 }
 
 // UTILS
@@ -584,3 +584,4 @@ setTimeout(() => { if (!map) initMap(13.0827, 80.2707); }, 1000);
 </script>
 </body>
 </html>
+
