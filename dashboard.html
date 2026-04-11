@@ -1,27 +1,349 @@
-﻿
-<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=no"><title>GuardianTrack</title><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.css"/><script src="https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.js"></script>
-<style>:root{--bg:#0A1628;--card:#112240;--card2:#162840;--teal:#00C9A7;--blue:#1A6EFF;--red:#FF4757;--warn:#FF6B35;--ok:#00E676;--text:#E8F0FE;--muted:#7A90B0;--border:rgba(0,201,167,0.15);}*{box-sizing:border-box;margin:0;padding:0;}html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--text);font-family:Segoe UI,system-ui,sans-serif;}#loginPage{position:fixed;inset:0;z-index:999;background:linear-gradient(145deg,#060f1e,#0d1f3c);display:flex;align-items:center;justify-content:center;padding:20px;}.lbox{width:100%;max-width:370px;background:var(--card);border:1px solid var(--border);border-radius:20px;padding:32px 24px 24px;}.ltitle{font-size:21px;font-weight:700;margin-bottom:4px;}.lsub{font-size:13px;color:var(--muted);margin-bottom:24px;}.llabel{font-size:11px;font-weight:600;color:var(--muted);letter-spacing:.7px;text-transform:uppercase;margin-bottom:5px;}.linput{width:100%;background:#0d1b30;border:1px solid var(--border);border-radius:10px;padding:12px 13px;font-size:14px;color:var(--text);margin-bottom:14px;outline:none;font-family:inherit;}.linput:focus{border-color:var(--teal);}.lbtn{width:100%;padding:13px;background:linear-gradient(135deg,var(--teal),var(--blue));border:none;border-radius:10px;font-size:15px;font-weight:700;color:#fff;cursor:pointer;font-family:inherit;}.lbtn:disabled{opacity:.7;}.lprog{width:100%;height:4px;background:#0d1b30;border-radius:2px;margin-top:12px;display:none;overflow:hidden;}.lbar{height:100%;width:0%;background:linear-gradient(90deg,var(--teal),var(--blue));border-radius:2px;transition:width 1s linear;}.lmsg{font-size:11px;color:var(--muted);text-align:center;margin-top:6px;min-height:16px;}.lerr{font-size:12px;color:var(--warn);text-align:center;margin-top:8px;min-height:16px;}</style>
-<style>#app{height:100%;display:flex;flex-direction:column;display:none;}.hdr{background:var(--card);border-bottom:1px solid var(--border);padding:11px 15px;display:flex;align-items:center;justify-content:space-between;flex-shrink:0;}.hdr-l{display:flex;align-items:center;gap:9px;}.hdr-icon{width:32px;height:32px;background:linear-gradient(135deg,var(--teal),var(--blue));border-radius:8px;display:flex;align-items:center;justify-content:center;}.hdr-title{font-size:15px;font-weight:700;}.hdr-sub{font-size:10px;color:var(--muted);}.dot{display:inline-block;width:7px;height:7px;border-radius:50%;background:var(--ok);box-shadow:0 0 6px var(--ok);animation:blink 2s infinite;margin-right:4px;}@keyframes blink{0%,100%{opacity:1}50%{opacity:.3}}.clock{font-size:12px;color:var(--muted);font-family:monospace;}.content{flex:1;overflow:hidden;position:relative;}.pane{display:none;height:100%;overflow-y:auto;}.pane.on{display:block;}.scroll{padding:13px;display:flex;flex-direction:column;gap:11px;padding-bottom:75px;}.sec-label{font-size:10px;font-weight:700;color:var(--muted);letter-spacing:.7px;text-transform:uppercase;margin-bottom:8px;}.prow{display:flex;gap:9px;overflow-x:auto;padding-bottom:2px;}.prow::-webkit-scrollbar{display:none;}.pchip{flex-shrink:0;display:flex;flex-direction:column;align-items:center;gap:3px;cursor:pointer;}.pavatar{width:50px;height:50px;border-radius:50%;background:var(--card2);border:2.5px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:700;color:var(--teal);font-family:monospace;transition:border-color .2s;}.pchip.sel .pavatar{border-color:var(--teal);box-shadow:0 0 0 3px rgba(0,201,167,.2);}.pname{font-size:10px;color:var(--muted);max-width:58px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;text-align:center;}.add-circle{width:50px;height:50px;border-radius:50%;border:2px dashed rgba(0,201,167,.4);display:flex;align-items:center;justify-content:center;font-size:26px;color:rgba(0,201,167,.8);cursor:pointer;}.add-chip{flex-shrink:0;display:flex;flex-direction:column;align-items:center;gap:3px;}</style>
-<style>.card{background:var(--card);border:1px solid var(--border);border-radius:15px;padding:13px 15px;}.srow{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;}.sname{font-size:15px;font-weight:700;}.badge{font-size:10px;font-weight:700;padding:3px 9px;border-radius:20px;text-transform:uppercase;}.bon{background:rgba(0,230,118,.15);color:var(--ok);}.boff{background:rgba(255,71,87,.15);color:var(--red);}.smeta{font-size:12px;color:var(--muted);}.div{height:1px;background:var(--border);margin:9px 0;}.sgrid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:7px;}.sitem{text-align:center;}.sval{font-size:16px;font-weight:700;font-family:monospace;}.slabel{font-size:10px;color:var(--muted);margin-top:1px;}.brow{display:flex;align-items:center;gap:7px;margin-top:7px;}.bbar{flex:1;height:5px;background:var(--bg);border-radius:3px;overflow:hidden;}.bfill{height:100%;border-radius:3px;transition:width .5s;}.btext{font-size:11px;font-family:monospace;color:var(--muted);min-width:30px;text-align:right;}.wcard{background:linear-gradient(135deg,#0d2137,#0a1628);border:1px solid var(--border);border-radius:15px;padding:13px 15px;display:flex;align-items:center;gap:11px;}.wicon{width:50px;height:50px;border-radius:13px;background:rgba(0,201,167,.1);display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:28px;}.wtemp{font-size:25px;font-weight:700;font-family:monospace;line-height:1;}.wdesc{font-size:12px;color:var(--muted);margin-top:2px;}.wdetails{display:flex;gap:11px;margin-top:5px;}.wdet{font-size:11px;color:var(--muted);}.wloc{font-size:11px;color:var(--teal);font-weight:600;margin-top:3px;}.arow{display:flex;gap:9px;}.abtn{flex:1;padding:11px 7px;border:1px solid var(--border);border-radius:12px;background:var(--card);cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:5px;font-family:inherit;}.abtn span{font-size:11px;color:var(--muted);}.sos{width:100%;padding:13px;background:linear-gradient(135deg,#c0392b,#e74c3c);border:none;border-radius:13px;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:9px;font-family:inherit;font-size:15px;font-weight:800;color:#fff;letter-spacing:.8px;}</style>
-<style>#map{height:100%;width:100%;}.moverlay{position:absolute;top:11px;left:11px;right:11px;z-index:500;pointer-events:none;}.mcard{background:rgba(10,22,40,.92);border:1px solid var(--border);border-radius:13px;padding:9px 13px;display:flex;align-items:center;gap:9px;pointer-events:all;}.mname{font-size:13px;font-weight:700;flex:1;}.mcoords{font-size:10px;color:var(--muted);font-family:monospace;}.aitem{background:var(--card);border:1px solid var(--border);border-radius:13px;padding:11px 13px;display:flex;align-items:flex-start;gap:11px;}.aicon{width:34px;height:34px;border-radius:9px;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:16px;}.atitle{font-size:13px;font-weight:600;margin-bottom:1px;}.atime{font-size:11px;color:var(--muted);}.adesc{font-size:12px;color:var(--muted);margin-top:2px;}.noalert{text-align:center;color:var(--muted);font-size:14px;padding:40px 20px;}.ssec{background:var(--card);border:1px solid var(--border);border-radius:15px;overflow:hidden;}.shdr{padding:9px 15px;font-size:10px;font-weight:700;color:var(--teal);letter-spacing:.7px;text-transform:uppercase;border-bottom:1px solid var(--border);}.srow2{display:flex;align-items:center;padding:13px 15px;gap:11px;border-bottom:1px solid var(--border);cursor:pointer;}.srow2:last-child{border-bottom:none;}.srlabel{font-size:14px;font-weight:500;}.srsub{font-size:11px;color:var(--muted);margin-top:1px;}.tog{width:42px;height:23px;border-radius:12px;background:var(--muted);position:relative;cursor:pointer;border:none;flex-shrink:0;transition:background .2s;}.tog.on{background:var(--teal);}.tog::after{content:"";position:absolute;width:17px;height:17px;border-radius:50%;background:#fff;top:3px;left:3px;transition:left .2s;}.tog.on::after{left:22px;}.nav{display:flex;background:var(--card);border-top:1px solid var(--border);padding:7px 0;flex-shrink:0;position:relative;z-index:10;}.nitem{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;cursor:pointer;padding:3px 0;border:none;background:none;font-family:inherit;}.nlabel{font-size:10px;color:var(--muted);font-weight:500;}.modal{position:fixed;inset:0;z-index:800;background:rgba(0,0,0,.7);display:flex;align-items:flex-end;justify-content:center;opacity:0;pointer-events:none;transition:opacity .25s;}.modal.open{opacity:1;pointer-events:all;}.mbox{width:100%;max-width:480px;background:var(--card);border-radius:22px 22px 0 0;border:1px solid var(--border);padding:18px 18px 38px;transform:translateY(100%);transition:transform .3s;}.modal.open .mbox{transform:translateY(0);}.mhandle{width:38px;height:4px;background:var(--muted);border-radius:2px;margin:0 auto 14px;}.mtitle{font-size:16px;font-weight:700;margin-bottom:14px;}.minput{width:100%;background:#0d1b30;border:1px solid var(--border);border-radius:10px;padding:12px 13px;font-size:14px;color:var(--text);margin-bottom:11px;outline:none;font-family:inherit;}.msave{width:100%;padding:12px;background:linear-gradient(135deg,var(--teal),var(--blue));border:none;border-radius:10px;font-size:15px;font-weight:700;color:#fff;cursor:pointer;font-family:inherit;}.mcancel{width:100%;padding:9px;background:none;border:none;font-size:14px;color:var(--muted);cursor:pointer;margin-top:5px;font-family:inherit;}.toast{position:fixed;bottom:82px;left:50%;transform:translateX(-50%) translateY(16px);background:var(--card2);border:1px solid var(--border);border-radius:9px;padding:9px 18px;font-size:13px;font-weight:500;z-index:900;opacity:0;transition:all .3s;pointer-events:none;white-space:nowrap;}.toast.show{opacity:1;transform:translateX(-50%) translateY(0);}</style>
-</head><body><div id="loginPage"><div class="lbox"><div class="ltitle">GuardianTrack</div><div class="lsub">Sign in to monitor your family</div><div class="llabel">Email Address</div><input class="linput" id="lemail" type="email" value="dineshbaskran23@gmail.com" placeholder="Email"><div class="llabel">Password</div><input class="linput" id="lpass" type="password" placeholder="Password" onkeydown="if(event.key==='Enter')doLogin()"><button class="lbtn" id="lbtn" onclick="doLogin()">Sign In</button><div class="lprog" id="lprog"><div class="lbar" id="lbar"></div></div><div class="lmsg" id="lmsg"></div><div class="lerr" id="lerr"></div></div></div>
-<div id="app"><div class="hdr"><div class="hdr-l"><div class="hdr-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg></div><div><div class="hdr-title">GuardianTrack</div><div class="hdr-sub"><span class="dot"></span><span id="hstatus">Live</span></div></div></div><div class="clock" id="clock">--:--</div></div>
-<div class="content"><div class="pane on" id="pane-home"><div class="scroll"><div><div class="sec-label">Tracking</div><div class="prow" id="prow"><div class="add-chip" onclick="openModal()"><div class="add-circle">+</div><span class="pname">Add</span></div></div></div><div class="card"><div class="srow"><div class="sname" id="tname">No person added</div><div class="badge boff" id="tbadge">OFFLINE</div></div><div class="smeta" id="tlastseen">Add a person to start tracking</div><div class="div"></div><div class="sgrid"><div class="sitem"><div class="sval" id="tspeed">--</div><div class="slabel">km/h</div></div><div class="sitem"><div class="sval" id="tdist">--</div><div class="slabel">km away</div></div><div class="sitem"><div class="sval" id="tupdates">0</div><div class="slabel">updates</div></div></div><div class="brow"><div class="bbar"><div class="bfill" id="bfill" style="width:0%;background:var(--teal)"></div></div><div class="btext" id="btext">--%</div></div></div>
-<div><div class="sec-label">Weather at Location</div><div class="wcard"><div class="wicon" id="wicon">&#9728;</div><div><div class="wtemp"><span id="wtemp">--</span>C</div><div class="wdesc" id="wdesc">Loading...</div><div class="wdetails"><div class="wdet" id="whum">Humidity: --%</div><div class="wdet" id="wwind">Wind: -- km/h</div></div><div class="wloc" id="wloc">Chennai, India</div></div></div></div>
-<div><div class="sec-label">Actions</div><div class="arow"><div class="abtn" onclick="callPerson()"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--teal)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.15 12 19.79 19.79 0 0 1 1.08 3.4 2 2 0 0 1 3.07 1.2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L7.09 9.14a16 16 0 0 0 7.8 7.8l1.2-1.2a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 17z"/></svg><span>Call</span></div><div class="abtn" onclick="showTab('map')"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--blue)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="1 6 1 22 8 18 16 22 23 18 23 2 16 6 8 2 1 6"/><line x1="8" y1="2" x2="8" y2="18"/><line x1="16" y1="6" x2="16" y2="22"/></svg><span>Map</span></div><div class="abtn" onclick="refresh()"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--warn)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg><span>Refresh</span></div></div></div>
-<button class="sos" onclick="sendSOS()"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>SEND SOS ALERT</button></div></div>
-<div class="pane" id="pane-map" style="position:relative"><div id="map"></div><div class="moverlay"><div class="mcard"><div class="mname" id="mname">Select a person</div><div class="mcoords" id="mcoords">---, ---</div></div></div></div>
-<div class="pane" id="pane-alerts"><div class="scroll" id="alist"><div class="noalert">No alerts yet</div></div></div>
-<div class="pane" id="pane-settings"><div class="scroll"><div class="ssec"><div class="shdr">Account</div><div class="srow2"><div><div class="srlabel" id="sname">Dinesh Baskaran</div><div class="srsub" id="semail">dineshbaskran23@gmail.com</div></div></div></div><div class="ssec"><div class="shdr">People</div><div class="srow2" onclick="openModal()"><div><div class="srlabel">Add Person</div><div class="srsub">Track a new family member</div></div></div><div class="srow2" onclick="removeLast()"><div><div class="srlabel" style="color:var(--red)">Remove Person</div><div class="srsub" id="pcount">0 people tracked</div></div></div></div><div class="ssec"><div class="shdr">System</div><div class="srow2" onclick="toggleAuto()"><div style="flex:1"><div class="srlabel">Auto Refresh</div><div class="srsub">Update every 30 seconds</div></div><button class="tog on" id="autotog"></button></div><div class="srow2" onclick="doLogout()"><div><div class="srlabel" style="color:var(--red)">Sign Out</div><div class="srsub">Log out of GuardianTrack</div></div></div></div></div></div></div></div>
-<nav class="nav"><button class="nitem on" id="nav-home" onclick="showTab('home')"><svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="var(--teal)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg><span class="nlabel" style="color:var(--teal)">Home</span></button><button class="nitem" id="nav-map" onclick="showTab('map')"><svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="var(--muted)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg><span class="nlabel">Map</span></button><button class="nitem" id="nav-alerts" onclick="showTab('alerts')"><svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="var(--muted)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg><span class="nlabel">Alerts</span></button><button class="nitem" id="nav-settings" onclick="showTab('settings')"><svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="var(--muted)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg><span class="nlabel">Settings</span></button></nav></div>
-<div class="modal" id="modal"><div class="mbox"><div class="mhandle"></div><div class="mtitle">Add Family Member</div><input class="minput" id="pname" placeholder="Name (e.g. Father)"><input class="minput" id="pphone" type="tel" placeholder="Phone number (e.g. 9952954742)"><input class="minput" id="prelation" placeholder="Relation (e.g. Father, Mother)"><button class="msave" onclick="savePerson()">Add Person</button><button class="mcancel" onclick="closeModal()">Cancel</button></div></div><div class="toast" id="toast"></div>
-<script>const BASE="https://guardiantrack-backend.onrender.com";let token=localStorage.getItem("gt_token")||"";let user=JSON.parse(localStorage.getItem("gt_user")||"null");let people=JSON.parse(localStorage.getItem("gt_people")||"[]");let active=null,map=null,marker=null,timer=null,auto=true,cnt=0;let myLat=13.0827,myLng=80.2707;setInterval(()=>{const n=new Date();document.getElementById("clock").textContent=n.toLocaleTimeString("en-IN",{hour:"2-digit",minute:"2-digit",hour12:true});},1000);window.onload=()=>{if(token&&user)showApp();};
-async function doLogin(){const email=document.getElementById("lemail").value.trim();const pass=document.getElementById("lpass").value.trim();const btn=document.getElementById("lbtn");const prog=document.getElementById("lprog");const bar=document.getElementById("lbar");const msg=document.getElementById("lmsg");const err=document.getElementById("lerr");err.textContent="";msg.textContent="";if(!email||!pass){err.textContent="Enter email and password";return;}btn.disabled=true;btn.textContent="Connecting...";prog.style.display="block";let alive=false;for(let i=0;i<70;i++){bar.style.width=Math.min(60,i*0.9)+"%";if(i===0)msg.textContent="Waking server up...";if(i===15)msg.textContent="Server starting (30-60s on free plan)...";if(i===35)msg.textContent="Almost ready...";if(i===55)msg.textContent="Taking longer than usual...";try{const c=new AbortController();setTimeout(()=>c.abort(),2500);const r=await fetch(BASE+"/health",{signal:c.signal});if(r.ok){alive=true;break;}}catch(e){}await new Promise(r=>setTimeout(r,1000));}bar.style.width="75%";msg.textContent="Logging in...";try{const c=new AbortController();setTimeout(()=>c.abort(),15000);const res=await fetch(BASE+"/api/auth/login",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({email,password:pass}),signal:c.signal});const d=await res.json();bar.style.width="100%";if(d.token){token=d.token;user=d.user;localStorage.setItem("gt_token",token);localStorage.setItem("gt_user",JSON.stringify(d.user));msg.textContent="Welcome!";setTimeout(showApp,300);}else{prog.style.display="none";msg.textContent="";err.textContent=d.error||"Wrong email or password";btn.disabled=false;btn.textContent="Sign In";}}catch(e){prog.style.display="none";msg.textContent="";err.textContent="Server did not respond. Try again.";btn.disabled=false;btn.textContent="Try Again";}}
-function showApp(){document.getElementById("loginPage").style.display="none";document.getElementById("app").style.display="flex";if(user){document.getElementById("sname").textContent=user.name||"User";document.getElementById("semail").textContent=user.email||"";}renderPeople();initMap();if(people.length>0){active=people[0];refresh();}if(auto)startTimer();fetchWeather(myLat,myLng);}function showTab(t){document.querySelectorAll(".pane").forEach(p=>p.classList.remove("on"));document.querySelectorAll(".nitem").forEach(n=>{n.classList.remove("on");n.querySelector(".nlabel").style.color="";});document.getElementById("pane-"+t).classList.add("on");const nb=document.getElementById("nav-"+t);nb.classList.add("on");nb.querySelector(".nlabel").style.color="var(--teal)";if(t==="map"&&map)setTimeout(()=>map.invalidateSize(),100);if(t==="alerts")loadAlerts();}
-function initMap(){if(map)return;map=L.map("map",{zoomControl:true,attributionControl:false}).setView([myLat,myLng],13);L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",{maxZoom:19}).addTo(map);const icon=L.divIcon({className:"",html:"<div style=\"width:14px;height:14px;border-radius:50%;background:#00C9A7;border:3px solid #fff;box-shadow:0 0 0 4px rgba(0,201,167,.3)\"></div>",iconSize:[14,14],iconAnchor:[7,7]});marker=L.marker([myLat,myLng],{icon}).addTo(map);}function updateMap(lat,lng,name){if(!map)return;marker.setLatLng([lat,lng]);map.setView([lat,lng],15);document.getElementById("mname").textContent=name||"Person";document.getElementById("mcoords").textContent=lat.toFixed(4)+", "+lng.toFixed(4);}
-function renderPeople(){const row=document.getElementById("prow");const add=row.lastElementChild;row.innerHTML="";people.forEach(p=>{const c=document.createElement("div");c.className="pchip"+(active&&active.id===p.id?" sel":"");c.onclick=()=>{active=p;renderPeople();refresh();};c.innerHTML="<div class=\"pavatar\">"+p.name[0].toUpperCase()+"</div><span class=\"pname\">"+p.name+"</span>";row.appendChild(c);});row.appendChild(add);document.getElementById("pcount").textContent=people.length+" people tracked";}function openModal(){document.getElementById("modal").classList.add("open");document.getElementById("pname").focus();}function closeModal(){document.getElementById("modal").classList.remove("open");document.getElementById("pname").value="";document.getElementById("pphone").value="";document.getElementById("prelation").value="";}function savePerson(){const name=document.getElementById("pname").value.trim();const phone=document.getElementById("pphone").value.trim();if(!name||!phone){showToast("Enter name and phone number");return;}const p={id:Date.now()+"",name,phone,relation:document.getElementById("prelation").value.trim()};people.push(p);localStorage.setItem("gt_people",JSON.stringify(people));active=p;closeModal();renderPeople();refresh();showToast(name+" added!");}function removeLast(){if(people.length===0){showToast("No people to remove");return;}const del=confirm("Remove: "+people[people.length-1].name+"?");if(del){const r=people.pop();localStorage.setItem("gt_people",JSON.stringify(people));if(active&&active.id===r.id)active=people.length>0?people[0]:null;renderPeople();showToast(r.name+" removed");}}
-async function refresh(){if(!active){document.getElementById("tname").textContent="No person selected";return;}document.getElementById("tname").textContent=active.name;try{const r=await fetch(BASE+"/api/parents",{headers:{"Authorization":"Bearer "+token}});if(!r.ok){setOff();return;}const data=await r.json();const list=Array.isArray(data)?data:(data.parents||data.data||[]);const match=list.find(p=>p.phone===active.phone);if(match)handleData(match);else setOff();}catch(e){setOff();}}function handleData(d){const loc=d.location||d.lastLocation||{};const lat=loc.lat||loc.latitude||(loc.coordinates&&loc.coordinates[1])||null;const lng=loc.lng||loc.longitude||(loc.coordinates&&loc.coordinates[0])||null;const batt=d.battery||d.batteryLevel||loc.battery||null;const online=d.isOnline||d.online||false;const speed=loc.speed||0;const seen=d.updatedAt||d.timestamp||d.lastSeen||null;const badge=document.getElementById("tbadge");badge.textContent=online?"ONLINE":"OFFLINE";badge.className="badge "+(online?"bon":"boff");if(seen)document.getElementById("tlastseen").textContent="Last seen: "+new Date(seen).toLocaleTimeString("en-IN");document.getElementById("tspeed").textContent=speed?speed.toFixed(1):"0.0";if(batt!==null){const p=batt>1?batt:batt*100;document.getElementById("bfill").style.width=p+"%";document.getElementById("bfill").style.background=p<20?"var(--warn)":p<50?"#f1c40f":"var(--teal)";document.getElementById("btext").textContent=Math.round(p)+"%";}cnt++;document.getElementById("tupdates").textContent=cnt;if(lat&&lng){const dist=haversine(myLat,myLng,lat,lng);document.getElementById("tdist").textContent=dist.toFixed(1);updateMap(lat,lng,active.name);fetchWeather(lat,lng);}}function setOff(){document.getElementById("tbadge").textContent="OFFLINE";document.getElementById("tbadge").className="badge boff";document.getElementById("tlastseen").textContent="Could not fetch location";}function haversine(a,b,c,d){const R=6371,dL=(c-a)*Math.PI/180,dN=(d-b)*Math.PI/180;const x=Math.sin(dL/2)*Math.sin(dL/2)+Math.cos(a*Math.PI/180)*Math.cos(c*Math.PI/180)*Math.sin(dN/2)*Math.sin(dN/2);return R*2*Math.atan2(Math.sqrt(x),Math.sqrt(1-x));}
-const WMO={0:"Clear sky",1:"Mainly clear",2:"Partly cloudy",3:"Overcast",45:"Foggy",51:"Light drizzle",53:"Drizzle",55:"Heavy drizzle",61:"Slight rain",63:"Rain",65:"Heavy rain",71:"Slight snow",73:"Snow",75:"Heavy snow",80:"Rain showers",81:"Rain showers",82:"Heavy showers",95:"Thunderstorm"};const WICO={0:"&#9728;",1:"&#9728;",2:"&#9925;",3:"&#9729;",45:"&#127787;",51:"&#127746;",53:"&#127746;",55:"&#127746;",61:"&#127783;",63:"&#127783;",65:"&#127783;",71:"&#10052;",73:"&#10052;",75:"&#10052;",80:"&#127783;",81:"&#127783;",82:"&#127783;",95:"&#9928;"};async function fetchWeather(lat,lng){try{const r=await fetch("https://api.open-meteo.com/v1/forecast?latitude="+lat+"&longitude="+lng+"&current=temperature_2m,relative_humidity_2m,wind_speed_10m,weather_code&wind_speed_unit=kmh&timezone=auto");const d=await r.json();const c=d.current;document.getElementById("wtemp").textContent=Math.round(c.temperature_2m);document.getElementById("wdesc").textContent=WMO[c.weather_code]||"Clear";document.getElementById("whum").textContent="Humidity: "+c.relative_humidity_2m+"%";document.getElementById("wwind").textContent="Wind: "+c.wind_speed_10m+" km/h";document.getElementById("wicon").innerHTML=WICO[c.weather_code]||"&#9728;";fetchCity(lat,lng);}catch(e){document.getElementById("wdesc").textContent="Weather unavailable";}}async function fetchCity(lat,lng){try{const r=await fetch("https://nominatim.openstreetmap.org/reverse?lat="+lat+"&lon="+lng+"&format=json");const d=await r.json();const city=d.address?.city||d.address?.town||d.address?.village||"";if(city)document.getElementById("wloc").textContent=city+", India";}catch(e){}}
-async function loadAlerts(){const list=document.getElementById("alist");try{const r=await fetch(BASE+"/api/alerts",{headers:{"Authorization":"Bearer "+token}});if(!r.ok)throw new Error();const d=await r.json();const alerts=Array.isArray(d)?d:(d.alerts||d.data||[]);if(alerts.length===0){list.innerHTML="<div class=\"noalert\">No alerts yet</div>";return;}list.innerHTML="";alerts.slice(0,20).forEach(a=>{const colors={sos:"var(--red)",geofence:"var(--warn)",battery:"#f1c40f",offline:"var(--muted)"};const col=colors[a.type]||"var(--teal)";const el=document.createElement("div");el.className="aitem";el.innerHTML="<div class=\"aicon\" style=\"background:"+col+"22;font-size:18px\">"+(a.type==="sos"?"&#128680;":"&#128276;")+"</div><div><div class=\"atitle\">"+(a.type||"ALERT").toUpperCase()+"</div><div class=\"atime\">"+new Date(a.createdAt||Date.now()).toLocaleString("en-IN")+"</div><div class=\"adesc\">"+(a.message||"")+"</div></div>";list.appendChild(el);});}catch(e){list.innerHTML="<div class=\"noalert\">Could not load alerts</div>";}}
-async function sendSOS(){if(!active){showToast("Select a person first");return;}if(!confirm("Send SOS for "+active.name+"?"))return;try{await fetch(BASE+"/api/alerts",{method:"POST",headers:{"Content-Type":"application/json","Authorization":"Bearer "+token},body:JSON.stringify({type:"sos",message:"SOS from dashboard for "+active.name,phone:active.phone})});}catch(e){}showToast("SOS alert sent!");}function callPerson(){if(!active){showToast("Select a person first");return;}window.open("tel:"+active.phone);}function startTimer(){if(timer)clearInterval(timer);timer=setInterval(()=>{if(auto&&active)refresh();},30000);}function toggleAuto(){auto=!auto;document.getElementById("autotog").classList.toggle("on",auto);if(auto){startTimer();showToast("Auto-refresh ON");}else{clearInterval(timer);showToast("Auto-refresh OFF");}}function doLogout(){if(!confirm("Sign out?"))return;localStorage.clear();location.reload();}function showToast(m){const t=document.getElementById("toast");t.textContent=m;t.classList.add("show");setTimeout(()=>t.classList.remove("show"),2800);}</script></body></html>
-
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=no">
+<title>GuardianTrack</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.css"/>
+<script src="https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.js"></script>
+<style>
+:root{--bg:#0A1628;--card:#112240;--card2:#162840;--teal:#00C9A7;--blue:#1A6EFF;--red:#FF4757;--warn:#FF6B35;--ok:#00E676;--text:#E8F0FE;--muted:#7A90B0;--border:rgba(0,201,167,0.15);}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
+html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--text);font-family:"Segoe UI",system-ui,sans-serif;}
+#loginPage{position:fixed;inset:0;z-index:999;background:linear-gradient(145deg,#060f1e,#0d1f3c);display:flex;align-items:center;justify-content:center;padding:20px;}
+.lbox{width:100%;max-width:370px;background:var(--card);border:1px solid var(--border);border-radius:20px;padding:32px 24px 24px;}
+.llogo{display:flex;align-items:center;gap:10px;margin-bottom:4px;}
+.licon{width:42px;height:42px;background:linear-gradient(135deg,var(--teal),var(--blue));border-radius:11px;display:flex;align-items:center;justify-content:center;}
+.ltitle{font-size:21px;font-weight:700;}
+.lsub{font-size:13px;color:var(--muted);margin-bottom:24px;}
+.llabel{font-size:11px;font-weight:600;color:var(--muted);letter-spacing:.7px;text-transform:uppercase;margin-bottom:5px;}
+.linput{width:100%;background:#0d1b30;border:1px solid var(--border);border-radius:10px;padding:12px 13px;font-size:14px;color:var(--text);margin-bottom:14px;outline:none;font-family:inherit;}
+.linput:focus{border-color:var(--teal);}
+.lbtn{width:100%;padding:13px;background:linear-gradient(135deg,var(--teal),var(--blue));border:none;border-radius:10px;font-size:15px;font-weight:700;color:#fff;cursor:pointer;font-family:inherit;}
+.lbtn:disabled{opacity:.7;}
+.lprog{width:100%;height:4px;background:#0d1b30;border-radius:2px;margin-top:12px;display:none;overflow:hidden;}
+.lbar{height:100%;width:0%;background:linear-gradient(90deg,var(--teal),var(--blue));border-radius:2px;transition:width 1s linear;}
+.lmsg{font-size:11px;color:var(--muted);text-align:center;margin-top:6px;min-height:16px;}
+.lerr{font-size:12px;color:var(--warn);text-align:center;margin-top:8px;min-height:16px;}
+#app{height:100%;display:flex;flex-direction:column;}
+.hdr{background:var(--card);border-bottom:1px solid var(--border);padding:11px 15px;display:flex;align-items:center;justify-content:space-between;flex-shrink:0;z-index:10;}
+.hdr-l{display:flex;align-items:center;gap:9px;}
+.hdr-icon{width:32px;height:32px;background:linear-gradient(135deg,var(--teal),var(--blue));border-radius:8px;display:flex;align-items:center;justify-content:center;}
+.hdr-title{font-size:15px;font-weight:700;}
+.hdr-sub{font-size:10px;color:var(--muted);}
+.dot{display:inline-block;width:7px;height:7px;border-radius:50%;background:var(--ok);box-shadow:0 0 6px var(--ok);animation:blink 2s infinite;margin-right:4px;}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.3}}
+.clock{font-size:12px;color:var(--muted);font-family:monospace;}
+.content{flex:1;overflow:hidden;position:relative;min-height:0;}
+.pane{display:none;height:100%;overflow-y:auto;}
+.pane.on{display:block;}
+.scroll{padding:13px;display:flex;flex-direction:column;gap:11px;padding-bottom:80px;}
+.sec-label{font-size:10px;font-weight:700;color:var(--muted);letter-spacing:.7px;text-transform:uppercase;margin-bottom:8px;}
+.prow{display:flex;gap:9px;overflow-x:auto;padding-bottom:2px;}
+.prow::-webkit-scrollbar{display:none;}
+.pchip{flex-shrink:0;display:flex;flex-direction:column;align-items:center;gap:3px;cursor:pointer;}
+.pavatar{width:50px;height:50px;border-radius:50%;background:var(--card2);border:2.5px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:700;color:var(--teal);font-family:monospace;}
+.pchip.sel .pavatar{border-color:var(--teal);box-shadow:0 0 0 3px rgba(0,201,167,.2);}
+.pname{font-size:10px;color:var(--muted);max-width:58px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;text-align:center;}
+.add-chip{flex-shrink:0;display:flex;flex-direction:column;align-items:center;gap:3px;cursor:pointer;}
+.add-circle{width:50px;height:50px;border-radius:50%;border:2px dashed rgba(0,201,167,.4);display:flex;align-items:center;justify-content:center;font-size:26px;color:rgba(0,201,167,.8);}
+.card{background:var(--card);border:1px solid var(--border);border-radius:15px;padding:13px 15px;}
+.srow{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;}
+.sname{font-size:15px;font-weight:700;}
+.badge{font-size:10px;font-weight:700;padding:3px 9px;border-radius:20px;text-transform:uppercase;}
+.bon{background:rgba(0,230,118,.15);color:var(--ok);}
+.boff{background:rgba(255,71,87,.15);color:var(--red);}
+.smeta{font-size:12px;color:var(--muted);}
+.divider{height:1px;background:var(--border);margin:9px 0;}
+.sgrid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:7px;}
+.sitem{text-align:center;}
+.sval{font-size:16px;font-weight:700;font-family:monospace;}
+.slabel{font-size:10px;color:var(--muted);margin-top:1px;}
+.brow{display:flex;align-items:center;gap:7px;margin-top:7px;}
+.bbar{flex:1;height:5px;background:var(--bg);border-radius:3px;overflow:hidden;}
+.bfill{height:100%;border-radius:3px;transition:width .5s;}
+.btext{font-size:11px;font-family:monospace;color:var(--muted);min-width:30px;text-align:right;}
+.wcard{background:linear-gradient(135deg,#0d2137,#0a1628);border:1px solid var(--border);border-radius:15px;padding:13px 15px;display:flex;align-items:center;gap:11px;}
+.wicon{width:50px;height:50px;border-radius:13px;background:rgba(0,201,167,.1);display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:28px;}
+.wtemp{font-size:25px;font-weight:700;font-family:monospace;line-height:1;}
+.wdesc{font-size:12px;color:var(--muted);margin-top:2px;}
+.wdetails{display:flex;gap:11px;margin-top:5px;}
+.wdet{font-size:11px;color:var(--muted);}
+.wloc{font-size:11px;color:var(--teal);font-weight:600;margin-top:3px;}
+.arow{display:flex;gap:9px;}
+.abtn{flex:1;padding:11px 7px;border:1px solid var(--border);border-radius:12px;background:var(--card);cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:5px;font-family:inherit;}
+.abtn span{font-size:11px;color:var(--muted);}
+.sos{width:100%;padding:13px;background:linear-gradient(135deg,#c0392b,#e74c3c);border:none;border-radius:13px;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:9px;font-family:inherit;font-size:15px;font-weight:800;color:#fff;letter-spacing:.8px;box-shadow:0 4px 15px rgba(255,71,87,.3);}
+#map{height:100%;width:100%;}
+.moverlay{position:absolute;top:11px;left:11px;right:11px;z-index:500;pointer-events:none;}
+.mcard{background:rgba(10,22,40,.92);border:1px solid var(--border);border-radius:13px;padding:9px 13px;display:flex;align-items:center;gap:9px;pointer-events:all;}
+.mname{font-size:13px;font-weight:700;flex:1;}
+.mcoords{font-size:10px;color:var(--muted);font-family:monospace;}
+.aitem{background:var(--card);border:1px solid var(--border);border-radius:13px;padding:11px 13px;display:flex;align-items:flex-start;gap:11px;}
+.aicon{width:34px;height:34px;border-radius:9px;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:18px;}
+.atitle{font-size:13px;font-weight:600;margin-bottom:1px;}
+.atime{font-size:11px;color:var(--muted);}
+.adesc{font-size:12px;color:var(--muted);margin-top:2px;}
+.noalert{text-align:center;color:var(--muted);font-size:14px;padding:40px 20px;}
+.ssec{background:var(--card);border:1px solid var(--border);border-radius:15px;overflow:hidden;margin-bottom:11px;}
+.shdr{padding:9px 15px;font-size:10px;font-weight:700;color:var(--teal);letter-spacing:.7px;text-transform:uppercase;border-bottom:1px solid var(--border);}
+.srow2{display:flex;align-items:center;padding:13px 15px;gap:11px;border-bottom:1px solid var(--border);cursor:pointer;}
+.srow2:last-child{border-bottom:none;}
+.srlabel{font-size:14px;font-weight:500;}
+.srsub{font-size:11px;color:var(--muted);margin-top:1px;}
+.tog{width:42px;height:23px;border-radius:12px;background:var(--muted);position:relative;cursor:pointer;border:none;flex-shrink:0;transition:background .2s;}
+.tog.on{background:var(--teal);}
+.tog::after{content:"";position:absolute;width:17px;height:17px;border-radius:50%;background:#fff;top:3px;left:3px;transition:left .2s;}
+.tog.on::after{left:22px;}
+.nav{display:flex;background:var(--card);border-top:1px solid var(--border);padding:8px 0 14px;flex-shrink:0;z-index:100;position:relative;}
+.nitem{flex:1;display:flex;flex-direction:column;align-items:center;gap:4px;cursor:pointer;padding:3px 0;border:none;background:none;font-family:inherit;}
+.nlabel{font-size:10px;color:var(--muted);font-weight:500;}
+.nitem.on .nlabel{color:var(--teal);}
+.modal{position:fixed;inset:0;z-index:800;background:rgba(0,0,0,.75);display:flex;align-items:flex-end;justify-content:center;opacity:0;pointer-events:none;transition:opacity .25s;}
+.modal.open{opacity:1;pointer-events:all;}
+.mbox{width:100%;max-width:480px;background:var(--card);border-radius:22px 22px 0 0;border:1px solid var(--border);padding:18px 18px 40px;transform:translateY(100%);transition:transform .3s cubic-bezier(.4,0,.2,1);}
+.modal.open .mbox{transform:translateY(0);}
+.mhandle{width:38px;height:4px;background:var(--muted);border-radius:2px;margin:0 auto 14px;}
+.mtitle{font-size:16px;font-weight:700;margin-bottom:14px;}
+.minput{width:100%;background:#0d1b30;border:1px solid var(--border);border-radius:10px;padding:12px 13px;font-size:14px;color:var(--text);margin-bottom:11px;outline:none;font-family:inherit;}
+.minput:focus{border-color:var(--teal);}
+.msave{width:100%;padding:12px;background:linear-gradient(135deg,var(--teal),var(--blue));border:none;border-radius:10px;font-size:15px;font-weight:700;color:#fff;cursor:pointer;font-family:inherit;}
+.mcancel{width:100%;padding:9px;background:none;border:none;font-size:14px;color:var(--muted);cursor:pointer;margin-top:5px;font-family:inherit;}
+.toast{position:fixed;bottom:90px;left:50%;transform:translateX(-50%) translateY(16px);background:var(--card2);border:1px solid var(--border);border-radius:9px;padding:9px 18px;font-size:13px;font-weight:500;z-index:900;opacity:0;transition:all .3s;pointer-events:none;white-space:nowrap;}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
+</style>
+</head>
+<body>
+<div id="loginPage">
+ <div class="lbox">
+  <div class="llogo"><div class="licon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg></div><div class="ltitle">GuardianTrack</div></div>
+  <div class="lsub">Sign in to monitor your family</div>
+  <div class="llabel">Email Address</div>
+  <input class="linput" id="lemail" type="email" value="dineshbaskran23@gmail.com" placeholder="Email" autocomplete="email">
+  <div class="llabel">Password</div>
+  <input class="linput" id="lpass" type="password" placeholder="Password" autocomplete="current-password">
+  <button class="lbtn" id="lbtn" onclick="doLogin()">Sign In</button>
+  <div class="lprog" id="lprog"><div class="lbar" id="lbar"></div></div>
+  <div class="lmsg" id="lmsg"></div>
+  <div class="lerr" id="lerr"></div>
+ </div>
+</div>
+<div id="app" style="display:none">
+ <div class="hdr">
+  <div class="hdr-l"><div class="hdr-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg></div><div><div class="hdr-title">GuardianTrack</div><div class="hdr-sub"><span class="dot"></span><span id="hstatus">Live</span></div></div></div>
+  <div class="clock" id="clock">--:--</div>
+ </div>
+ <div class="content">
+  <div class="pane on" id="pane-home"><div class="scroll">
+   <div><div class="sec-label">Tracking</div><div class="prow" id="prow"><div class="add-chip" onclick="openModal()"><div class="add-circle">+</div><span class="pname">Add</span></div></div></div>
+   <div class="card">
+    <div class="srow"><div class="sname" id="tname">No person added</div><div class="badge boff" id="tbadge">OFFLINE</div></div>
+    <div class="smeta" id="tlastseen">Add a person to start tracking</div>
+    <div class="divider"></div>
+    <div class="sgrid"><div class="sitem"><div class="sval" id="tspeed">--</div><div class="slabel">km/h</div></div><div class="sitem"><div class="sval" id="tdist">--</div><div class="slabel">km away</div></div><div class="sitem"><div class="sval" id="tupdates">0</div><div class="slabel">updates</div></div></div>
+    <div class="brow"><div class="bbar"><div class="bfill" id="bfill" style="width:0%;background:var(--teal)"></div></div><div class="btext" id="btext">--%</div></div>
+   </div>
+   <div><div class="sec-label">Weather at Location</div>
+    <div class="wcard"><div class="wicon" id="wicon">&#9728;</div><div><div class="wtemp"><span id="wtemp">--</span>&deg;C</div><div class="wdesc" id="wdesc">Loading...</div><div class="wdetails"><div class="wdet" id="whum">Humidity: --%</div><div class="wdet" id="wwind">Wind: -- km/h</div></div><div class="wloc" id="wloc">Chennai, India</div></div></div>
+   </div>
+   <div><div class="sec-label">Actions</div>
+    <div class="arow">
+     <div class="abtn" onclick="callPerson()"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--teal)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.15 12 19.79 19.79 0 0 1 1.08 3.4 2 2 0 0 1 3.07 1.2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L7.09 9.14a16 16 0 0 0 7.8 7.8l1.2-1.2a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 17z"/></svg><span>Call</span></div>
+     <div class="abtn" onclick="showTab('map')"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--blue)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="1 6 1 22 8 18 16 22 23 18 23 2 16 6 8 2 1 6"/><line x1="8" y1="2" x2="8" y2="18"/><line x1="16" y1="6" x2="16" y2="22"/></svg><span>Map</span></div>
+     <div class="abtn" onclick="refresh()"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--warn)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg><span>Refresh</span></div>
+    </div>
+   </div>
+   <button class="sos" onclick="sendSOS()"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>SEND SOS ALERT</button>
+  </div></div>
+  <div class="pane" id="pane-map" style="position:relative"><div id="map"></div><div class="moverlay"><div class="mcard"><div class="mname" id="mname">Select a person</div><div class="mcoords" id="mcoords">---, ---</div></div></div></div>
+  <div class="pane" id="pane-alerts"><div class="scroll" id="alist"><div class="noalert">No alerts yet</div></div></div>
+  <div class="pane" id="pane-settings"><div class="scroll">
+   <div class="ssec"><div class="shdr">Account</div><div class="srow2"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="var(--teal)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg><div><div class="srlabel" id="sname">Dinesh Baskaran</div><div class="srsub" id="semail">dineshbaskran23@gmail.com</div></div></div></div>
+   <div class="ssec"><div class="shdr">People</div>
+    <div class="srow2" onclick="openModal()"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="var(--teal)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="8.5" cy="7" r="4"/><line x1="20" y1="8" x2="20" y2="14"/><line x1="23" y1="11" x2="17" y2="11"/></svg><div style="flex:1"><div class="srlabel">Add Person</div><div class="srsub">Track a new family member</div></div><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--muted)" stroke-width="2" stroke-linecap="round"><polyline points="9 18 15 12 9 6"/></svg></div>
+    <div class="srow2" onclick="removePerson()"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="var(--red)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg><div style="flex:1"><div class="srlabel" style="color:var(--red)">Remove Person</div><div class="srsub" id="pcount">0 people tracked</div></div><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--muted)" stroke-width="2" stroke-linecap="round"><polyline points="9 18 15 12 9 6"/></svg></div>
+   </div>
+   <div class="ssec"><div class="shdr">System</div>
+    <div class="srow2" onclick="toggleAuto()"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="var(--blue)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg><div style="flex:1"><div class="srlabel">Auto Refresh</div><div class="srsub">Update every 30 seconds</div></div><button class="tog on" id="autotog"></button></div>
+    <div class="srow2" onclick="doLogout()"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="var(--red)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg><div style="flex:1"><div class="srlabel" style="color:var(--red)">Sign Out</div><div class="srsub">Log out of GuardianTrack</div></div></div>
+   </div>
+  </div></div>
+ </div>
+ <nav class="nav">
+  <button class="nitem on" id="nav-home" onclick="showTab('home')"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="var(--teal)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg><span class="nlabel" style="color:var(--teal)">Home</span></button>
+  <button class="nitem" id="nav-map" onclick="showTab('map')"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="var(--muted)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg><span class="nlabel">Map</span></button>
+  <button class="nitem" id="nav-alerts" onclick="showTab('alerts')"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="var(--muted)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg><span class="nlabel">Alerts</span></button>
+  <button class="nitem" id="nav-settings" onclick="showTab('settings')"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="var(--muted)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg><span class="nlabel">Settings</span></button>
+ </nav>
+</div>
+<div class="modal" id="modal"><div class="mbox"><div class="mhandle"></div><div class="mtitle">Add Family Member</div><input class="minput" id="pname" placeholder="Name (e.g. Father)"><input class="minput" id="pphone" type="tel" placeholder="Phone number (e.g. 9952954742)"><input class="minput" id="prelation" placeholder="Relation (e.g. Father, Mother)"><button class="msave" onclick="savePerson()">Add Person</button><button class="mcancel" onclick="closeModal()">Cancel</button></div></div>
+<div class="toast" id="toast"></div>
+<script>
+const BASE="https://guardiantrack-backend.onrender.com";
+let token=localStorage.getItem("gt_token")||"";
+let user=JSON.parse(localStorage.getItem("gt_user")||"null");
+let people=JSON.parse(localStorage.getItem("gt_people")||"[]");
+let active=null,map=null,marker=null,timer=null,autoR=true,cnt=0;
+const myLat=13.0827,myLng=80.2707;
+function san(s){const d=document.createElement("div");d.textContent=s||"";return d.innerHTML;}
+setInterval(()=>{const n=new Date();document.getElementById("clock").textContent=n.toLocaleTimeString("en-IN",{hour:"2-digit",minute:"2-digit",hour12:true});},1000);
+window.onload=async()=>{
+ if(token&&user){
+  try{const r=await fetch(BASE+"/api/auth/me",{headers:{"Authorization":"Bearer "+token}});if(r.ok){showApp();return;}}catch(e){}
+  localStorage.removeItem("gt_token");localStorage.removeItem("gt_user");token="";user=null;
+ }
+ document.getElementById("loginPage").style.display="flex";
+};
+async function doLogin(){
+ const email=document.getElementById("lemail").value.trim();
+ const pass=document.getElementById("lpass").value.trim();
+ const btn=document.getElementById("lbtn"),prog=document.getElementById("lprog"),bar=document.getElementById("lbar"),msg=document.getElementById("lmsg"),err=document.getElementById("lerr");
+ err.textContent="";msg.textContent="";
+ if(!email||!pass){err.textContent="Enter email and password";return;}
+ if(!email.includes("@")){err.textContent="Enter a valid email address";return;}
+ btn.disabled=true;btn.textContent="Connecting...";prog.style.display="block";
+ for(let i=0;i<70;i++){
+  bar.style.width=Math.min(60,i*0.9)+"%";
+  if(i===0)msg.textContent="Waking server up...";
+  if(i===15)msg.textContent="Server starting (30-60s on free plan)...";
+  if(i===35)msg.textContent="Almost ready...";
+  if(i===55)msg.textContent="Taking longer than usual...";
+  try{const c=new AbortController();setTimeout(()=>c.abort(),2500);const r=await fetch(BASE+"/health",{signal:c.signal});if(r.ok)break;}catch(e){}
+  await new Promise(r=>setTimeout(r,1000));
+ }
+ bar.style.width="75%";msg.textContent="Logging in...";
+ try{
+  const c=new AbortController();setTimeout(()=>c.abort(),15000);
+  const res=await fetch(BASE+"/api/auth/login",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({email,password:pass}),signal:c.signal});
+  const d=await res.json();bar.style.width="100%";
+  if(d.token){token=d.token;user=d.user;localStorage.setItem("gt_token",token);localStorage.setItem("gt_user",JSON.stringify(d.user));msg.textContent="Welcome!";setTimeout(showApp,300);}
+  else{prog.style.display="none";msg.textContent="";err.textContent=d.error||"Wrong email or password";btn.disabled=false;btn.textContent="Sign In";}
+ }catch(e){prog.style.display="none";msg.textContent="";err.textContent="Server did not respond. Try again.";btn.disabled=false;btn.textContent="Try Again";}
+}
+document.addEventListener("keydown",e=>{if(e.key==="Enter"&&document.getElementById("loginPage").style.display!=="none")doLogin();});
+function showApp(){
+ document.getElementById("loginPage").style.display="none";
+ document.getElementById("app").style.display="flex";
+ if(user){document.getElementById("sname").textContent=san(user.name||"User");document.getElementById("semail").textContent=san(user.email||"");}
+ renderPeople();initMap();
+ if(people.length>0){active=people[0];refresh();}
+ if(autoR)startTimer();
+ fetchWeather(myLat,myLng);
+}
+function showTab(t){
+ document.querySelectorAll(".pane").forEach(p=>p.classList.remove("on"));
+ document.querySelectorAll(".nitem").forEach(n=>{n.classList.remove("on");n.querySelector(".nlabel").style.color="";n.querySelector("svg").setAttribute("stroke","var(--muted)");});
+ document.getElementById("pane-"+t).classList.add("on");
+ const nb=document.getElementById("nav-"+t);nb.classList.add("on");
+ nb.querySelector(".nlabel").style.color="var(--teal)";
+ nb.querySelector("svg").setAttribute("stroke","var(--teal)");
+ if(t==="map"&&map)setTimeout(()=>map.invalidateSize(),100);
+ if(t==="alerts")loadAlerts();
+}
+function initMap(){
+ if(map)return;
+ map=L.map("map",{zoomControl:true,attributionControl:false}).setView([myLat,myLng],13);
+ L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",{maxZoom:19}).addTo(map);
+ const icon=L.divIcon({className:"",html:'<div style="width:14px;height:14px;border-radius:50%;background:#00C9A7;border:3px solid #fff;box-shadow:0 0 0 4px rgba(0,201,167,.3)"></div>',iconSize:[14,14],iconAnchor:[7,7]});
+ marker=L.marker([myLat,myLng],{icon}).addTo(map);
+}
+function updateMap(lat,lng,name){if(!map)return;marker.setLatLng([lat,lng]);map.setView([lat,lng],15);document.getElementById("mname").textContent=san(name||"Person");document.getElementById("mcoords").textContent=lat.toFixed(4)+", "+lng.toFixed(4);}
+function renderPeople(){
+ const row=document.getElementById("prow");const add=row.lastElementChild;row.innerHTML="";
+ people.forEach(p=>{const c=document.createElement("div");c.className="pchip"+(active&&active.id===p.id?" sel":"");c.onclick=()=>{active=p;renderPeople();refresh();};c.innerHTML='<div class="pavatar">'+san(p.name[0].toUpperCase())+'</div><span class="pname">'+san(p.name)+"</span>";row.appendChild(c);});
+ row.appendChild(add);document.getElementById("pcount").textContent=people.length+" people tracked";
+}
+function openModal(){document.getElementById("modal").classList.add("open");document.getElementById("pname").focus();}
+function closeModal(){document.getElementById("modal").classList.remove("open");document.getElementById("pname").value="";document.getElementById("pphone").value="";document.getElementById("prelation").value="";}
+function savePerson(){
+ const name=document.getElementById("pname").value.trim();
+ const phone=document.getElementById("pphone").value.trim().replace(/[^0-9+]/g,"");
+ if(!name||!phone){showToast("Enter name and phone number");return;}
+ if(phone.length<10){showToast("Enter a valid 10-digit phone number");return;}
+ const p={id:Date.now()+"",name:name.substring(0,20),phone,relation:document.getElementById("prelation").value.trim().substring(0,15)};
+ people.push(p);localStorage.setItem("gt_people",JSON.stringify(people));active=p;closeModal();renderPeople();refresh();showToast(san(p.name)+" added!");
+}
+function removePerson(){
+ if(people.length===0){showToast("No people to remove");return;}
+ const names=people.map((p,i)=>(i+1)+". "+p.name+" ("+p.phone+")").join("\n");
+ const choice=prompt("Which person to remove? Enter number:\n\n"+names);
+ if(choice===null)return;
+ const idx=parseInt(choice)-1;
+ if(isNaN(idx)||idx<0||idx>=people.length){showToast("Invalid selection");return;}
+ const removed=people.splice(idx,1)[0];
+ localStorage.setItem("gt_people",JSON.stringify(people));
+ if(active&&active.id===removed.id)active=people.length>0?people[0]:null;
+ renderPeople();showToast(san(removed.name)+" removed");
+}
+async function refresh(){
+ if(!active){document.getElementById("tname").textContent="No person selected";return;}
+ document.getElementById("tname").textContent=san(active.name);
+ try{
+  const c=new AbortController();setTimeout(()=>c.abort(),10000);
+  const r=await fetch(BASE+"/api/parents",{headers:{"Authorization":"Bearer "+token},signal:c.signal});
+  if(r.status===401){doLogout();return;}if(!r.ok){setOff();return;}
+  const data=await r.json();const list=Array.isArray(data)?data:(data.parents||data.data||[]);
+  const match=list.find(p=>p.phone===active.phone);
+  if(match)handleData(match);else setOff();
+ }catch(e){setOff();}
+}
+function handleData(d){
+ const loc=d.location||d.lastLocation||{};
+ const lat=loc.lat||loc.latitude||(loc.coordinates&&loc.coordinates[1])||null;
+ const lng=loc.lng||loc.longitude||(loc.coordinates&&loc.coordinates[0])||null;
+ const batt=d.battery||d.batteryLevel||loc.battery||null;
+ const online=d.isOnline||d.online||false;const speed=loc.speed||0;const seen=d.updatedAt||d.timestamp||d.lastSeen||null;
+ const badge=document.getElementById("tbadge");badge.textContent=online?"ONLINE":"OFFLINE";badge.className="badge "+(online?"bon":"boff");
+ if(seen)document.getElementById("tlastseen").textContent="Last seen: "+new Date(seen).toLocaleTimeString("en-IN");
+ document.getElementById("tspeed").textContent=speed?speed.toFixed(1):"0.0";
+ if(batt!==null){const p=batt>1?batt:batt*100;document.getElementById("bfill").style.width=p+"%";document.getElementById("bfill").style.background=p<20?"var(--warn)":p<50?"#f1c40f":"var(--teal)";document.getElementById("btext").textContent=Math.round(p)+"%";}
+ cnt++;document.getElementById("tupdates").textContent=cnt;
+ if(lat&&lng){document.getElementById("tdist").textContent=haversine(myLat,myLng,lat,lng).toFixed(1);updateMap(lat,lng,active.name);fetchWeather(lat,lng);}
+}
+function setOff(){document.getElementById("tbadge").textContent="OFFLINE";document.getElementById("tbadge").className="badge boff";document.getElementById("tlastseen").textContent="Could not fetch location";}
+function haversine(a,b,c,d){const R=6371,dL=(c-a)*Math.PI/180,dN=(d-b)*Math.PI/180;const x=Math.sin(dL/2)*Math.sin(dL/2)+Math.cos(a*Math.PI/180)*Math.cos(c*Math.PI/180)*Math.sin(dN/2)*Math.sin(dN/2);return R*2*Math.atan2(Math.sqrt(x),Math.sqrt(1-x));}
+const WMO={0:"Clear sky",1:"Mainly clear",2:"Partly cloudy",3:"Overcast",45:"Foggy",51:"Light drizzle",53:"Drizzle",55:"Heavy drizzle",61:"Slight rain",63:"Rain",65:"Heavy rain",71:"Slight snow",73:"Snow",75:"Heavy snow",80:"Rain showers",81:"Rain showers",82:"Heavy showers",95:"Thunderstorm"};
+const WICO={0:"&#9728;",1:"&#9728;",2:"&#9925;",3:"&#9729;",45:"&#127787;",51:"&#127746;",53:"&#127746;",55:"&#127746;",61:"&#127783;",63:"&#127783;",65:"&#127783;",71:"&#10052;",73:"&#10052;",75:"&#10052;",80:"&#127783;",81:"&#127783;",82:"&#127783;",95:"&#9928;"};
+async function fetchWeather(lat,lng){
+ try{
+  const r=await fetch("https://api.open-meteo.com/v1/forecast?latitude="+lat+"&longitude="+lng+"&current=temperature_2m,relative_humidity_2m,wind_speed_10m,weather_code&wind_speed_unit=kmh&timezone=auto");
+  const d=await r.json();const c=d.current;
+  document.getElementById("wtemp").textContent=Math.round(c.temperature_2m);
+  document.getElementById("wdesc").textContent=WMO[c.weather_code]||"Clear";
+  document.getElementById("whum").textContent="Humidity: "+c.relative_humidity_2m+"%";
+  document.getElementById("wwind").textContent="Wind: "+c.wind_speed_10m+" km/h";
+  document.getElementById("wicon").innerHTML=WICO[c.weather_code]||"&#9728;";
+  fetchCity(lat,lng);
+ }catch(e){document.getElementById("wdesc").textContent="Weather unavailable";}
+}
+async function fetchCity(lat,lng){try{const r=await fetch("https://nominatim.openstreetmap.org/reverse?lat="+lat+"&lon="+lng+"&format=json");const d=await r.json();const city=d.address?.city||d.address?.town||d.address?.village||"";if(city)document.getElementById("wloc").textContent=san(city)+", India";}catch(e){}}
+async function loadAlerts(){
+ const list=document.getElementById("alist");
+ try{
+  const r=await fetch(BASE+"/api/alerts",{headers:{"Authorization":"Bearer "+token}});
+  if(!r.ok)throw new Error();const d=await r.json();const alerts=Array.isArray(d)?d:(d.alerts||d.data||[]);
+  if(alerts.length===0){list.innerHTML='<div class="noalert">No alerts yet</div>';return;}
+  list.innerHTML="";
+  alerts.slice(0,20).forEach(a=>{
+   const colors={sos:"var(--red)",geofence:"var(--warn)",battery:"#f1c40f",offline:"var(--muted)"};
+   const col=colors[a.type]||"var(--teal)";const el=document.createElement("div");el.className="aitem";
+   const ico=a.type==="sos"?"&#128680;":a.type==="battery"?"&#128267;":"&#128276;";
+   el.innerHTML='<div class="aicon" style="background:'+col+'22">'+ico+'</div><div><div class="atitle">'+san((a.type||"alert").toUpperCase())+'</div><div class="atime">'+new Date(a.createdAt||Date.now()).toLocaleString("en-IN")+'</div><div class="adesc">'+san(a.message||"")+"</div></div>";
+   list.appendChild(el);
+  });
+ }catch(e){list.innerHTML='<div class="noalert">Could not load alerts</div>';}
+}
+async function sendSOS(){
+ if(!active){showToast("Select a person first");return;}
+ if(!confirm("Send SOS alert for "+active.name+"?"))return;
+ try{await fetch(BASE+"/api/alerts",{method:"POST",headers:{"Content-Type":"application/json","Authorization":"Bearer "+token},body:JSON.stringify({type:"sos",message:"SOS from dashboard for "+active.name,phone:active.phone})});}catch(e){}
+ showToast("SOS alert sent!");
+}
+function callPerson(){if(!active){showToast("Select a person first");return;}window.open("tel:"+active.phone);}
+function startTimer(){if(timer)clearInterval(timer);timer=setInterval(()=>{if(autoR&&active)refresh();},30000);}
+function toggleAuto(){autoR=!autoR;document.getElementById("autotog").classList.toggle("on",autoR);if(autoR){startTimer();showToast("Auto-refresh ON");}else{clearInterval(timer);showToast("Auto-refresh OFF");}}
+function doLogout(){if(!confirm("Sign out of GuardianTrack?"))return;localStorage.removeItem("gt_token");localStorage.removeItem("gt_user");token="";user=null;location.reload();}
+function showToast(m){const t=document.getElementById("toast");t.textContent=m;t.classList.add("show");setTimeout(()=>t.classList.remove("show"),2800);}
+</script>
+</body>
+</html>
