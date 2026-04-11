@@ -565,8 +565,8 @@ async function login() {
     const res = await fetch(BASE + '/api/auth/login', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({phone, password:pass}) });
     const data = await res.json();
     if (data.token) { localStorage.setItem('gt_token', data.token); token = data.token; fetchLocation(); showToast('Logged in!'); }
-    else alert('Login failed: ' + (data.message || 'Check credentials'));
-  } catch(e) { alert('Server waking up - wait 60 seconds and try again'); }
+    else showToast('Wrong email or password - try again');
+  } catch(e) { alert('Connection error'); }
 }
 function logout() {
   if (!confirm('Logout?')) return;
