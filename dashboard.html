@@ -22,7 +22,7 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--text);fon
 .lbtn{width:100%;padding:13px;background:linear-gradient(135deg,var(--teal),var(--blue));border:none;border-radius:10px;font-size:15px;font-weight:700;color:#fff;cursor:pointer;font-family:inherit;}
 .lbtn:disabled{opacity:.7;}
 .lprog{width:100%;height:4px;background:#0d1b30;border-radius:2px;margin-top:12px;display:none;overflow:hidden;}
-.lbar{height:100%;width:0%;background:linear-gradient(90deg,var(--teal),var(--blue));border-radius:2px;transition:width 1s linear;}
+.lbar{height:100%;width:0%;background:linear-gradient(90deg,var(--teal),var(--blue));border-radius:2px;transition:width 0.8s linear;}
 .lmsg{font-size:11px;color:var(--muted);text-align:center;margin-top:6px;min-height:16px;}
 .lerr{font-size:12px;color:var(--warn);text-align:center;margin-top:8px;min-height:16px;}
 #app{height:100%;display:flex;flex-direction:column;}
@@ -76,9 +76,19 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--text);fon
 .sos{width:100%;padding:13px;background:linear-gradient(135deg,#c0392b,#e74c3c);border:none;border-radius:13px;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:9px;font-family:inherit;font-size:15px;font-weight:800;color:#fff;letter-spacing:.8px;box-shadow:0 4px 15px rgba(255,71,87,.3);}
 #map{height:100%;width:100%;}
 .moverlay{position:absolute;top:11px;left:11px;right:11px;z-index:500;pointer-events:none;}
-.mcard{background:rgba(10,22,40,.92);border:1px solid var(--border);border-radius:13px;padding:9px 13px;display:flex;align-items:center;gap:9px;pointer-events:all;}
+.mcard{background:rgba(10,22,40,.92);border:1px solid var(--border);border-radius:13px;padding:9px 13px;display:flex;align-items:center;gap:9px;pointer-events:all;cursor:pointer;}
+.mcard:active{background:rgba(0,201,167,.08);}
 .mname{font-size:13px;font-weight:700;flex:1;}
 .mcoords{font-size:10px;color:var(--muted);font-family:monospace;}
+.mpicker{position:absolute;top:60px;left:0;right:0;z-index:501;background:rgba(10,22,40,.97);border:1px solid var(--border);border-radius:13px;overflow:hidden;display:none;pointer-events:all;}
+.mpicker.open{display:block;}
+.mpitem{padding:13px 15px;display:flex;align-items:center;gap:11px;cursor:pointer;border-bottom:1px solid var(--border);}
+.mpitem:last-child{border-bottom:none;}
+.mpitem:active{background:rgba(0,201,167,.1);}
+.mpavatar{width:36px;height:36px;border-radius:50%;background:var(--card2);display:flex;align-items:center;justify-content:center;font-size:15px;font-weight:700;color:var(--teal);font-family:monospace;flex-shrink:0;}
+.mpname{font-size:14px;font-weight:600;}
+.mprel{font-size:11px;color:var(--muted);}
+.mptick{margin-left:auto;color:var(--teal);font-size:16px;}
 .aitem{background:var(--card);border:1px solid var(--border);border-radius:13px;padding:11px 13px;display:flex;align-items:flex-start;gap:11px;}
 .aicon{width:34px;height:34px;border-radius:9px;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:18px;}
 .atitle{font-size:13px;font-weight:600;margin-bottom:1px;}
@@ -155,7 +165,16 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--text);fon
    </div>
    <button class="sos" onclick="sendSOS()"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>SEND SOS ALERT</button>
   </div></div>
-  <div class="pane" id="pane-map" style="position:relative"><div id="map"></div><div class="moverlay"><div class="mcard"><div class="mname" id="mname">Select a person</div><div class="mcoords" id="mcoords">---, ---</div></div></div></div>
+  <div class="pane" id="pane-map" style="position:relative">
+   <div id="map"></div>
+   <div class="moverlay">
+    <div class="mcard" onclick="togglePersonPicker()">
+     <div class="mname" id="mname">Select a person</div>
+     <div class="mcoords" id="mcoords">Tap to choose &#9662;</div>
+    </div>
+    <div class="mpicker" id="mpicker"></div>
+   </div>
+  </div>
   <div class="pane" id="pane-alerts"><div class="scroll" id="alist"><div class="noalert">No alerts yet</div></div></div>
   <div class="pane" id="pane-settings"><div class="scroll">
    <div class="ssec"><div class="shdr">Account</div><div class="srow2"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="var(--teal)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg><div><div class="srlabel" id="sname">Dinesh Baskaran</div><div class="srsub" id="semail">dineshbaskran23@gmail.com</div></div></div></div>
@@ -185,8 +204,10 @@ let user=JSON.parse(localStorage.getItem("gt_user")||"null");
 let people=JSON.parse(localStorage.getItem("gt_people")||"[]");
 let active=null,map=null,marker=null,timer=null,autoR=true,cnt=0;
 const myLat=13.0827,myLng=80.2707;
+
 function san(s){const d=document.createElement("div");d.textContent=s||"";return d.innerHTML;}
 setInterval(()=>{const n=new Date();document.getElementById("clock").textContent=n.toLocaleTimeString("en-IN",{hour:"2-digit",minute:"2-digit",hour12:true});},1000);
+
 window.onload=async()=>{
  if(token&&user){
   try{const r=await fetch(BASE+"/api/auth/me",{headers:{"Authorization":"Bearer "+token}});if(r.ok){showApp();return;}}catch(e){}
@@ -194,33 +215,97 @@ window.onload=async()=>{
  }
  document.getElementById("loginPage").style.display="flex";
 };
+
+// ── THE CORE FIX ──────────────────────────────────────────────────────────────
+// Phase 1: Wake server - ANY http response (even 404/405) means server is UP.
+//          Only a network error / timeout means it is still sleeping.
+// Phase 2: Once server is confirmed up, do the real login.
+// ─────────────────────────────────────────────────────────────────────────────
+async function pingUntilAlive(msg,bar,maxSeconds){
+ const probes=["/"," /health","/api/auth/login"];
+ for(let s=0;s<maxSeconds;s++){
+  bar.style.width=Math.min(60,s*0.65)+"%";
+  if(s===0) msg.textContent="Waking server up...";
+  else if(s<20) msg.textContent="Server is starting... "+s+"s";
+  else if(s<45) msg.textContent="Still warming up... "+s+"s";
+  else if(s<70) msg.textContent="Almost ready... "+s+"s";
+  else msg.textContent="Nearly there... "+s+"s";
+  for(const path of probes){
+   try{
+    const c=new AbortController();
+    setTimeout(()=>c.abort(),3500);
+    await fetch(BASE+path,{signal:c.signal});
+    // Any response at all (200, 404, 405, 500) = server is alive!
+    return true;
+   }catch(e){
+    // Network error or timeout = server still asleep, keep waiting
+   }
+  }
+  await new Promise(r=>setTimeout(r,1000));
+ }
+ return false;
+}
+
 async function doLogin(){
  const email=document.getElementById("lemail").value.trim();
  const pass=document.getElementById("lpass").value.trim();
- const btn=document.getElementById("lbtn"),prog=document.getElementById("lprog"),bar=document.getElementById("lbar"),msg=document.getElementById("lmsg"),err=document.getElementById("lerr");
+ const btn=document.getElementById("lbtn"),prog=document.getElementById("lprog"),
+       bar=document.getElementById("lbar"),msg=document.getElementById("lmsg"),
+       err=document.getElementById("lerr");
  err.textContent="";msg.textContent="";
  if(!email||!pass){err.textContent="Enter email and password";return;}
  if(!email.includes("@")){err.textContent="Enter a valid email address";return;}
  btn.disabled=true;btn.textContent="Connecting...";prog.style.display="block";
- for(let i=0;i<70;i++){
-  bar.style.width=Math.min(60,i*0.9)+"%";
-  if(i===0)msg.textContent="Waking server up...";
-  if(i===15)msg.textContent="Server starting (30-60s on free plan)...";
-  if(i===35)msg.textContent="Almost ready...";
-  if(i===55)msg.textContent="Taking longer than usual...";
-  try{const c=new AbortController();setTimeout(()=>c.abort(),2500);const r=await fetch(BASE+"/health",{signal:c.signal});if(r.ok)break;}catch(e){}
-  await new Promise(r=>setTimeout(r,1000));
+
+ // Phase 1: wake the server
+ const alive=await pingUntilAlive(msg,bar,90);
+ if(!alive){
+  prog.style.display="none";msg.textContent="";
+  err.textContent="Server is not reachable. Check your internet and try again.";
+  btn.disabled=false;btn.textContent="Try Again";return;
  }
- bar.style.width="75%";msg.textContent="Logging in...";
+
+ // Phase 2: server is awake, now login
+ bar.style.width="70%";msg.textContent="Server is up! Signing you in...";
  try{
-  const c=new AbortController();setTimeout(()=>c.abort(),15000);
-  const res=await fetch(BASE+"/api/auth/login",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({email,password:pass}),signal:c.signal});
-  const d=await res.json();bar.style.width="100%";
-  if(d.token){token=d.token;user=d.user;localStorage.setItem("gt_token",token);localStorage.setItem("gt_user",JSON.stringify(d.user));msg.textContent="Welcome!";setTimeout(showApp,300);}
-  else{prog.style.display="none";msg.textContent="";err.textContent=d.error||"Wrong email or password";btn.disabled=false;btn.textContent="Sign In";}
- }catch(e){prog.style.display="none";msg.textContent="";err.textContent="Server did not respond. Try again.";btn.disabled=false;btn.textContent="Try Again";}
+  const c=new AbortController();
+  setTimeout(()=>c.abort(),30000);
+  const res=await fetch(BASE+"/api/auth/login",{
+   method:"POST",
+   headers:{"Content-Type":"application/json"},
+   body:JSON.stringify({email,password:pass}),
+   signal:c.signal
+  });
+  const d=await res.json();
+  bar.style.width="100%";
+  if(d.token){
+   token=d.token;user=d.user;
+   localStorage.setItem("gt_token",token);
+   localStorage.setItem("gt_user",JSON.stringify(d.user));
+   msg.textContent="Welcome!";
+   startKeepAlive();
+   setTimeout(showApp,300);
+  } else {
+   prog.style.display="none";msg.textContent="";
+   err.textContent=d.error||"Wrong email or password";
+   btn.disabled=false;btn.textContent="Sign In";
+  }
+ }catch(e){
+  prog.style.display="none";msg.textContent="";
+  err.textContent="Login timed out. Server just woke up — please tap Try Again now.";
+  btn.disabled=false;btn.textContent="Try Again";
+ }
 }
+
+// Keep server warm: ping /api/auth/me every 8 minutes so it never sleeps
+function startKeepAlive(){
+ setInterval(async()=>{
+  try{await fetch(BASE+"/api/auth/me",{headers:{"Authorization":"Bearer "+token}});}catch(e){}
+ },8*60*1000);
+}
+
 document.addEventListener("keydown",e=>{if(e.key==="Enter"&&document.getElementById("loginPage").style.display!=="none")doLogin();});
+
 function showApp(){
  document.getElementById("loginPage").style.display="none";
  document.getElementById("app").style.display="flex";
@@ -230,6 +315,7 @@ function showApp(){
  if(autoR)startTimer();
  fetchWeather(myLat,myLng);
 }
+
 function showTab(t){
  document.querySelectorAll(".pane").forEach(p=>p.classList.remove("on"));
  document.querySelectorAll(".nitem").forEach(n=>{n.classList.remove("on");n.querySelector(".nlabel").style.color="";n.querySelector("svg").setAttribute("stroke","var(--muted)");});
@@ -240,6 +326,7 @@ function showTab(t){
  if(t==="map"&&map)setTimeout(()=>map.invalidateSize(),100);
  if(t==="alerts")loadAlerts();
 }
+
 function initMap(){
  if(map)return;
  map=L.map("map",{zoomControl:true,attributionControl:false}).setView([myLat,myLng],13);
@@ -247,14 +334,45 @@ function initMap(){
  const icon=L.divIcon({className:"",html:'<div style="width:14px;height:14px;border-radius:50%;background:#00C9A7;border:3px solid #fff;box-shadow:0 0 0 4px rgba(0,201,167,.3)"></div>',iconSize:[14,14],iconAnchor:[7,7]});
  marker=L.marker([myLat,myLng],{icon}).addTo(map);
 }
-function updateMap(lat,lng,name){if(!map)return;marker.setLatLng([lat,lng]);map.setView([lat,lng],15);document.getElementById("mname").textContent=san(name||"Person");document.getElementById("mcoords").textContent=lat.toFixed(4)+", "+lng.toFixed(4);}
+
+function updateMap(lat,lng,name){
+ if(!map)return;
+ marker.setLatLng([lat,lng]);
+ map.setView([lat,lng],15);
+ document.getElementById("mname").textContent=san(name||"Person");
+ document.getElementById("mcoords").textContent=lat.toFixed(4)+", "+lng.toFixed(4)+" ▾";
+}
+
+function togglePersonPicker(){
+ const picker=document.getElementById("mpicker");
+ if(people.length===0){showToast("Add a person on Home first");return;}
+ if(picker.classList.contains("open")){picker.classList.remove("open");return;}
+ picker.innerHTML="";
+ people.forEach(p=>{
+  const el=document.createElement("div");
+  el.className="mpitem";
+  const tick=(active&&active.id===p.id)?'<span class="mptick">&#10003;</span>':"";
+  el.innerHTML='<div class="mpavatar">'+san(p.name[0].toUpperCase())+'</div><div><div class="mpname">'+san(p.name)+'</div><div class="mprel">'+san(p.relation||p.phone)+'</div></div>'+tick;
+  if(active&&active.id===p.id)el.style.background="rgba(0,201,167,.12)";
+  el.onclick=()=>{active=p;picker.classList.remove("open");renderPeople();refresh();showToast("Tracking "+san(p.name));};
+  picker.appendChild(el);
+ });
+ picker.classList.add("open");
+}
+document.addEventListener("click",function(e){
+ const picker=document.getElementById("mpicker");
+ if(picker&&!picker.contains(e.target)&&!e.target.closest(".mcard")){picker.classList.remove("open");}
+});
+
 function renderPeople(){
  const row=document.getElementById("prow");const add=row.lastElementChild;row.innerHTML="";
  people.forEach(p=>{const c=document.createElement("div");c.className="pchip"+(active&&active.id===p.id?" sel":"");c.onclick=()=>{active=p;renderPeople();refresh();};c.innerHTML='<div class="pavatar">'+san(p.name[0].toUpperCase())+'</div><span class="pname">'+san(p.name)+"</span>";row.appendChild(c);});
  row.appendChild(add);document.getElementById("pcount").textContent=people.length+" people tracked";
 }
+
 function openModal(){document.getElementById("modal").classList.add("open");document.getElementById("pname").focus();}
 function closeModal(){document.getElementById("modal").classList.remove("open");document.getElementById("pname").value="";document.getElementById("pphone").value="";document.getElementById("prelation").value="";}
+
 function savePerson(){
  const name=document.getElementById("pname").value.trim();
  const phone=document.getElementById("pphone").value.trim().replace(/[^0-9+]/g,"");
@@ -263,6 +381,7 @@ function savePerson(){
  const p={id:Date.now()+"",name:name.substring(0,20),phone,relation:document.getElementById("prelation").value.trim().substring(0,15)};
  people.push(p);localStorage.setItem("gt_people",JSON.stringify(people));active=p;closeModal();renderPeople();refresh();showToast(san(p.name)+" added!");
 }
+
 function removePerson(){
  if(people.length===0){showToast("No people to remove");return;}
  const names=people.map((p,i)=>(i+1)+". "+p.name+" ("+p.phone+")").join("\n");
@@ -275,6 +394,7 @@ function removePerson(){
  if(active&&active.id===removed.id)active=people.length>0?people[0]:null;
  renderPeople();showToast(san(removed.name)+" removed");
 }
+
 async function refresh(){
  if(!active){document.getElementById("tname").textContent="No person selected";return;}
  document.getElementById("tname").textContent=san(active.name);
@@ -287,6 +407,7 @@ async function refresh(){
   if(match)handleData(match);else setOff();
  }catch(e){setOff();}
 }
+
 function handleData(d){
  const loc=d.location||d.lastLocation||{};
  const lat=loc.lat||loc.latitude||(loc.coordinates&&loc.coordinates[1])||null;
@@ -300,10 +421,13 @@ function handleData(d){
  cnt++;document.getElementById("tupdates").textContent=cnt;
  if(lat&&lng){document.getElementById("tdist").textContent=haversine(myLat,myLng,lat,lng).toFixed(1);updateMap(lat,lng,active.name);fetchWeather(lat,lng);}
 }
+
 function setOff(){document.getElementById("tbadge").textContent="OFFLINE";document.getElementById("tbadge").className="badge boff";document.getElementById("tlastseen").textContent="Could not fetch location";}
 function haversine(a,b,c,d){const R=6371,dL=(c-a)*Math.PI/180,dN=(d-b)*Math.PI/180;const x=Math.sin(dL/2)*Math.sin(dL/2)+Math.cos(a*Math.PI/180)*Math.cos(c*Math.PI/180)*Math.sin(dN/2)*Math.sin(dN/2);return R*2*Math.atan2(Math.sqrt(x),Math.sqrt(1-x));}
+
 const WMO={0:"Clear sky",1:"Mainly clear",2:"Partly cloudy",3:"Overcast",45:"Foggy",51:"Light drizzle",53:"Drizzle",55:"Heavy drizzle",61:"Slight rain",63:"Rain",65:"Heavy rain",71:"Slight snow",73:"Snow",75:"Heavy snow",80:"Rain showers",81:"Rain showers",82:"Heavy showers",95:"Thunderstorm"};
 const WICO={0:"&#9728;",1:"&#9728;",2:"&#9925;",3:"&#9729;",45:"&#127787;",51:"&#127746;",53:"&#127746;",55:"&#127746;",61:"&#127783;",63:"&#127783;",65:"&#127783;",71:"&#10052;",73:"&#10052;",75:"&#10052;",80:"&#127783;",81:"&#127783;",82:"&#127783;",95:"&#9928;"};
+
 async function fetchWeather(lat,lng){
  try{
   const r=await fetch("https://api.open-meteo.com/v1/forecast?latitude="+lat+"&longitude="+lng+"&current=temperature_2m,relative_humidity_2m,wind_speed_10m,weather_code&wind_speed_unit=kmh&timezone=auto");
@@ -317,6 +441,7 @@ async function fetchWeather(lat,lng){
  }catch(e){document.getElementById("wdesc").textContent="Weather unavailable";}
 }
 async function fetchCity(lat,lng){try{const r=await fetch("https://nominatim.openstreetmap.org/reverse?lat="+lat+"&lon="+lng+"&format=json");const d=await r.json();const city=d.address?.city||d.address?.town||d.address?.village||"";if(city)document.getElementById("wloc").textContent=san(city)+", India";}catch(e){}}
+
 async function loadAlerts(){
  const list=document.getElementById("alist");
  try{
@@ -333,12 +458,14 @@ async function loadAlerts(){
   });
  }catch(e){list.innerHTML='<div class="noalert">Could not load alerts</div>';}
 }
+
 async function sendSOS(){
  if(!active){showToast("Select a person first");return;}
  if(!confirm("Send SOS alert for "+active.name+"?"))return;
  try{await fetch(BASE+"/api/alerts",{method:"POST",headers:{"Content-Type":"application/json","Authorization":"Bearer "+token},body:JSON.stringify({type:"sos",message:"SOS from dashboard for "+active.name,phone:active.phone})});}catch(e){}
  showToast("SOS alert sent!");
 }
+
 function callPerson(){if(!active){showToast("Select a person first");return;}window.open("tel:"+active.phone);}
 function startTimer(){if(timer)clearInterval(timer);timer=setInterval(()=>{if(autoR&&active)refresh();},30000);}
 function toggleAuto(){autoR=!autoR;document.getElementById("autotog").classList.toggle("on",autoR);if(autoR){startTimer();showToast("Auto-refresh ON");}else{clearInterval(timer);showToast("Auto-refresh OFF");}}
